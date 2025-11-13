@@ -3,12 +3,14 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Enable the React Compiler if you want automatic memoization support
-  reactCompiler: true,
+  reactCompiler: false,
 
   // Enable “Cache Components” if you plan to use the new caching APIs / use cache directive
   cacheComponents: true,
 
-  // TailwindCSS & TypeScript are supported out-of-the-box, so no extra config needed for them here
+  allowedDevOrigins: ["localhost", "192.168.56.1"],
+
+  
 
   // (Optional) Custom image config or aliasing, only add if you need it
   images: {
