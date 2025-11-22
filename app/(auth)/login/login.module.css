@@ -1,0 +1,36 @@
+.loginContainer {
+    background-color: var(--color-background);
+    padding: 40px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 2px 35px var(--color-secondary-shadow);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+    margin: auto;
+    /* Center in the flex body */
+}
+
+.loginSubtitle {
+    margin-top: 0;
+    color: var(--color-text);
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.loginTeks {
+    color: var(--color-text);
+    margin-bottom: 24px;
+}
+
+.loginButton {
+    margin-top: 20px;
+}
+
+.loginErrorMessage {
+    color: #dc3545;
+    margin-top: 15px;
+    font-size: 14px;
+    font-weight: bold;
+    min-height: 20px;
+}

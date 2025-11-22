@@ -1,0 +1,74 @@
+.button {
+    appearance: none;
+    cursor: pointer;
+
+    display: inline-flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+
+    padding: 8px 16px;
+    font-size: 1rem;
+
+    color: var(--color-text);
+    background-color: white;
+
+    border: 2px solid var(--yellow-50);
+    border-radius: 6px;
+
+    font-weight: 600;
+
+    box-shadow: 0 2px 8px 0 rgba(185, 136, 1, 0.1);
+
+    transition: .2s ease-out;
+}
+
+.button:hover {
+    box-shadow: 0 3px 12px 0 rgba(185, 136, 1, 0.25);
+}
+
+.filled {
+    background-color: var(--color-primary-highlight);
+    box-shadow: 0 2px 8px 0 rgba(185, 136, 1, 0.25);
+}
+
+.filled:hover {
+    background-color: var(--yellow-70);
+    box-shadow: 0 3px 12px 0 rgba(185, 136, 1, 0.5);
+}
+
+.flat {
+    background-color: transparent;
+    box-shadow: none;
+    border: none;
+}
+
+.flat:hover {
+    background-color: color-mix(in srgb, var(--yellow-90) 50%, transparent);
+}
+
+.destructive {
+    background-color: var(--red-50);
+    color: #d9534f;
+    border-color: #d9534f;
+    box-shadow: 0 2px 8px 0 color-mix(in srgb, #d9534f 25%, transparent);
+}
+
+.destructive:hover {
+    background-color: var(--red-70);
+    box-shadow: 0 3px 12px 0 color-mix(in srgb, #d9534f 50%, transparent);
+}
+
+.button:disabled {
+    cursor: not-allowed;
+    color: black;
+    background: #ccc;
+    border-color: transparent;
+    opacity: 0.5;
+    box-shadow: none;
+}
+
+.fullWidth {
+    width: 100%;
+}
