@@ -1,0 +1,101 @@
+@import "@/app/globals.css";
+
+.tableContainer {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid var(--color-primary-shadow);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.tableData {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: inherit;
+    font-size: 15px;
+    background-color: var(--color-secondary);
+}
+
+.tableData thead {
+    background-color: var(--color-primary);
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.tableData th {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--color-primary-shadow);
+    border-left: 1px solid var(--color-primary-shadow);
+    white-space: nowrap;
+}
+
+.tableData th:first-child {
+    border-left: none;
+}
+
+.tableData td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-primary-shadow);
+    border-right: 1px solid var(--color-primary-shadow);
+    background-color: var(--color-secondary);
+    vertical-align: middle;
+    color: var(--color-text);
+}
+
+.tableData td:last-child {
+    border-right: none;
+}
+
+.tableData tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.tableData tbody tr:hover td {
+    background-color: var(--color-secondary-shadow);
+    transition: background-color 0.2s ease;
+}
+
+.noDataCell {
+    text-align: center;
+    padding: 40px;
+    color: var(--color-text-shadow);
+    font-style: italic;
+    background-color: var(--color-secondary) !important;
+    border: none !important;
+}
+
+.actionCell {
+    white-space: nowrap;
+    text-align: center;
+}
+
+.actionGroup {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+}
+
+.iconWrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.actionButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0px;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+    color: var(--color-text);
+}
+
+.actionButton:hover {
+    opacity: 0.7;
+    text-decoration: underline;
+}
