@@ -2,17 +2,16 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-// Jika kamu punya komponen UI khusus di components/ui, kita bisa import di sini nanti.
-// Untuk sekarang kita pakai standard HTML/Bootstrap class dulu.
 
-// Tipe Data
+// 1. Tipe Data (Sesuai dengan data dari API/Prisma)
 interface Product {
-  id: number;
+  id: string; // ID dari Prisma biasanya String (CUID/UUID)
   name: string;
   sku: string;
   price: number;
-  image: string;
+  image: string | null; // Bisa null kalau dari database belum ada gambar
   stock: number;
+  category?: string;
 }
 
 interface CartItem extends Product {
@@ -20,19 +19,33 @@ interface CartItem extends Product {
 }
 
 export default function POSTerminal() {
-  // --- 1. Data Dummy (Sementara, nanti ganti fetch API) ---
-  const products: Product[] = [
-    { id: 1, name: "Kopi Hitam", sku: "KH001", price: 15000, image: "/img/products/kopi-hitam.png", stock: 20 },
-    { id: 2, name: "Cappuccino", sku: "CP002", price: 25000, image: "/img/products/cappuccino.jpg", stock: 15 },
-    { id: 3, name: "Espresso", sku: "ES003", price: 18000, image: "/img/products/kopi-hitam.png", stock: 10 },
-    { id: 4, name: "Latte", sku: "LT004", price: 28000, image: "/img/products/cappuccino.jpg", stock: 5 },
-    { id: 5, name: "Mocha", sku: "MC005", price: 30000, image: "/img/products/kopi-hitam.png", stock: 12 },
-  ];
-
-  // --- 2. State ---
+  // --- STATE MANAGEMENT ---
+  const [products, setProducts] = useState<Product[]>([]); // Data produk dari API
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]); // Data hasil search
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
+
+  // --- 2. FETCH DATA DARI API (BAGIAN BARU) ---
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch("/api/products");
+        if (!response.ok) throw new Error("Gagal mengambil data produk");
+        
+        const data = await response.json();
+        setProducts(data);
+        setFilteredProducts(data);
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        alert("Gagal memuat produk dari database.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   // --- 3. Logic Search ---
   useEffect(() => {
@@ -41,7 +54,7 @@ export default function POSTerminal() {
       p.sku.toLowerCase().includes(searchQuery.toLowerCase())
     );
     setFilteredProducts(filtered);
-  }, [searchQuery]);
+  }, [searchQuery, products]);
 
   // --- 4. Helper Format Rupiah ---
   const formatRupiah = (num: number) => {
@@ -62,7 +75,7 @@ export default function POSTerminal() {
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         ));
       } else {
-        alert(`Stok untuk ${product.name} tidak mencukupi!`);
+        alert(`Stok untuk ${product.name} tidak mencukupi! (Sisa: ${product.stock})`);
       }
     } else {
       if (product.stock > 0) {
@@ -73,7 +86,7 @@ export default function POSTerminal() {
     }
   };
 
-  const updateQuantity = (id: number, type: "plus" | "minus") => {
+  const updateQuantity = (id: string, type: "plus" | "minus") => {
     const existingItem = cart.find((item) => item.id === id);
     if (!existingItem) return;
 
@@ -92,7 +105,7 @@ export default function POSTerminal() {
     }
   };
 
-  const removeFromCart = (id: number) => {
+  const removeFromCart = (id: string) => {
     setCart(cart.filter((item) => item.id !== id));
   };
 
@@ -137,11 +150,18 @@ export default function POSTerminal() {
 
             {/* Product Grid */}
             <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 overflow-auto" style={{ maxHeight: "calc(100vh - 250px)" }}>
-              {filteredProducts.length === 0 ? (
+              {isLoading ? (
+                <div className="col-12 text-center mt-5">
+                  <div className="spinner-border text-warning" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                  <p className="mt-2 text-muted">Memuat produk dari database...</p>
+                </div>
+              ) : filteredProducts.length === 0 ? (
                 <div className="col-12 text-center mt-5" style={{ color: "#aaa" }}>
                   <span className="material-symbols-outlined" style={{ fontSize: "80px", marginBottom: "16px" }}>sentiment_dissatisfied</span>
                   <p className="fs-4 fw-bold mb-1" style={{ color: "#888" }}>Belum Ada Produk</p>
-                  <span>Silakan ubah kata kunci pencarian.</span>
+                  <span>Coba cari kata kunci lain atau tambahkan produk di database.</span>
                 </div>
               ) : (
                 filteredProducts.map((product) => (
@@ -152,16 +172,20 @@ export default function POSTerminal() {
                       style={{ cursor: "pointer" }}
                     >
                       <div style={{ height: "110px", width: "100%", overflow: "hidden", borderRadius: "8px", backgroundColor: "#f0f0f0" }}>
+                        {/* Fallback image karena di database 'image' masih null */}
                         <img 
-                          src={product.image} 
+                          src={product.image || "https://placehold.co/150x110?text=No+Img"} 
                           alt={product.name} 
                           style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                          onError={(e) => (e.currentTarget.src = "https://placehold.co/150x110?text=No+Img")}
+                          onError={(e) => (e.currentTarget.src = "https://placehold.co/150x110?text=Error")}
                         />
                       </div>
-                      <div className="mt-3 fw-bold" style={{ fontSize: "0.95rem" }}>{product.name}</div>
+                      <div className="mt-3 fw-bold text-truncate" style={{ fontSize: "0.95rem" }}>{product.name}</div>
                       <div className="mt-1 small text-primary fw-bold" style={{ color: "var(--color-text-highlight)" }}>
                         {formatRupiah(product.price)}
+                      </div>
+                      <div className="mt-1 small text-muted" style={{ fontSize: "0.8rem" }}>
+                        Stok: {product.stock}
                       </div>
                     </div>
                   </div>
@@ -171,7 +195,7 @@ export default function POSTerminal() {
           </div>
         </div>
 
-        {/* === BAGIAN KANAN: KERANJANG === */}
+        {/* === BAGIAN KANAN: KERANJANG (Sama Persis) === */}
         <div className="col-md-4 p-3">
           <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column">
             {/* Header Cart */}
@@ -206,7 +230,7 @@ export default function POSTerminal() {
               )}
             </div>
 
-            {/* Footer Cart: Summary & Button */}
+            {/* Footer Cart */}
             <div className="mt-auto pt-3 border-top border-2" style={{ borderColor: "#EFCE9E" }}>
               <div className="d-flex justify-content-between mb-2">
                 <span>Subtotal</span>
