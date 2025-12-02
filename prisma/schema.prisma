@@ -40,7 +40,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  sales     Sale[]   // A user (cashier) can perform many sales
+  transactions Transaction[]   // A user (cashier) can perform many transactions
 }
 
 model Category {
@@ -63,7 +63,7 @@ model Product {
   // Relations
   categoryId  String?
   category    Category?  @relation(fields: [categoryId], references: [id])
-  saleItems   SaleItem[] // A product can be sold many times
+  transactionItems TransactionItem[] // A product can be sold many times
 }
 
 model Member {
@@ -76,35 +76,43 @@ model Member {
   updatedAt DateTime @updatedAt
 
   // Relations
-  sales     Sale[]   // A member can make many purchases
+  transactions Transaction[]   // A member can make many purchases
 }
 
-model Sale {
+model Transaction {
   id            String        @id @default(cuid())
   invoiceId     String        @unique // e.g., "INV-20251017-001"
+  
+  // Financials
   total         Int
+  subtotal      Int
+  tax           Int
+  discount      Int           @default(0)
+  amountReceived Int
+  change        Int
+
   paymentMethod PaymentMethod
   createdAt     DateTime      @default(now())
 
   // Relations
-  cashierId     String
-  cashier       User          @relation(fields: [cashierId], references: [id])
+  userId        String
+  user          User          @relation(fields: [userId], references: [id])
   
   memberId      String?
   member        Member?       @relation(fields: [memberId], references: [id])
 
-  items         SaleItem[]
+  items         TransactionItem[]
 }
 
-model SaleItem {
+model TransactionItem {
   id        String  @id @default(cuid())
   quantity  Int
   price     Int     // IMPORTANT: Store the price AT THE TIME OF SALE. 
                       // If product price changes later, history must remain accurate.
   
   // Relations
-  saleId    String
-  sale      Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
+  transactionId String
+  transaction   Transaction    @relation(fields: [transactionId], references: [id], onDelete: Cascade)
   
   productId String
   product   Product @relation(fields: [productId], references: [id])
