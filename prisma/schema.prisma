@@ -26,12 +26,16 @@ enum PaymentMethod {
 }
 
 model User {
-  id              Int           @id @default(uuid())
-  employeeId      String        @unique
-  password        String      
-  role            Role          @default(CASHIER)
-  createdAt       DateTime     @default(now())
-  transactions    Transaction[]
+  id        String   @id @default(cuid())
+  username  String   @unique // For login (e.g., "EMP001")
+  password  String   // Will store Hashed Password
+  name      String
+  role      Role     @default(CASHIER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  transactions Transaction[]   // A user (cashier) can perform many transactions
 }
 
 model Category {
@@ -41,47 +45,72 @@ model Category {
 }
 
 model Product {
-  id          Int         @id @default(autoincrement())
-  sku         String      @unique
-  name        String 
-  price       Decimal 
-  stock       Int 
-  categoryId  Int
-  category    Category    @relation(fields: [categoryId], references: [id])
-  soldItems   TransactionItem[]
+  id          String   @id @default(cuid())
+  sku         String   @unique // Barcode/Unique Code
+  name        String
+  description String?
+  price       Int      // Store in IDR (e.g. 15000). Avoid Float for money!
+  stock       Int      @default(0)
+  image       String?  // URL to image if you add upload feature later
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  categoryId  String?
+  category    Category?  @relation(fields: [categoryId], references: [id])
+  transactionItems TransactionItem[] // A product can be sold many times
 }
 
 model Member {
-  id            Int           @id @default(autoincrement())
-  name          String 
-  phone         String 
-  email         String
-  transactions  Transaction[]
+  id        String   @id @default(cuid())
+  name      String
+  phone     String   @unique
+  email     String?
+  points    Int      @default(0) // For "Should Have" loyalty features
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  transactions Transaction[]   // A member can make many purchases
 }
 
 model Transaction {
-  id            Int           @id @default(autoincrement())
-  displayId     String        @unique
-  subtotal      Decimal 
-  tax           Decimal 
-  totalAmount   Decimal
+  id            String        @id @default(cuid())
+  invoiceId     String        @unique // e.g., "INV-20251017-001"
+  
+  // Financials
+  total         Int
+  subtotal      Int
+  tax           Int
+  discount      Int           @default(0)
+  amountReceived Int
+  change        Int
+
   paymentMethod PaymentMethod
   cashReceived  Decimal
   changeAmount  Decimal
   createdAt     DateTime      @default(now())
-  userId        Int
+
+  // Relations
+  userId        String
   user          User          @relation(fields: [userId], references: [id])
-  memberId      Int
-  member        Member        @relation(fields: [memberId], references: [id])
+  
+  memberId      String?
+  member        Member?       @relation(fields: [memberId], references: [id])
+
   items         TransactionItem[]
 }
 
 model TransactionItem {
-  id            Int           @id @default(autoincrement())
-  quantity      Int 
-  priceAtSale   Decimal
-  transactionId Int
-  transaction   Transaction   @relation(fields: [transactionId], references: [id])
-  productId     Int
-  product       Product       @relation(fields: [productId], references: [id])
+  id        String  @id @default(cuid())
+  quantity  Int
+  price     Int     // IMPORTANT: Store the price AT THE TIME OF SALE. 
+                      // If product price changes later, history must remain accurate.
+  
+  // Relations
+  transactionId String
+  transaction   Transaction    @relation(fields: [transactionId], references: [id], onDelete: Cascade)
+  
+  productId String
+  product   Product @relation(fields: [productId], references: [id])
 }
