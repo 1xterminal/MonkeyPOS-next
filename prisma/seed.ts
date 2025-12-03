@@ -7,21 +7,23 @@ async function main() {
     console.log('Start seeding...')
 
     // 1. Create Categories
-    const drinks = await prisma.category.upsert({
-        where: { name: 'Drinks' },
-        update: {},
-        create: {
-            name: 'Drinks',
-        },
+    let drinks = await prisma.category.findFirst({
+        where: { name: 'Drinks' }
     })
+    if (!drinks) {
+        drinks = await prisma.category.create({
+            data: { name: 'Drinks' }
+        })
+    }
 
-    const food = await prisma.category.upsert({
-        where: { name: 'Food' },
-        update: {},
-        create: {
-            name: 'Food',
-        },
+    let food = await prisma.category.findFirst({
+        where: { name: 'Food' }
     })
+    if (!food) {
+        food = await prisma.category.create({
+            data: { name: 'Food' }
+        })
+    }
 
     console.log('Created categories:', drinks.name, food.name)
 
