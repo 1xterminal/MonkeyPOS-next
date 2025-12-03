@@ -8,14 +8,17 @@ export default function Sidebar() {
 
   const isActive = (path: string) => pathname.startsWith(path) ? "active" : "";
 
+  // Hide Sidebar on Login Page
+  if (pathname === "/login") return null;
+
   return (
     <div className="sidebar">
-      
+
       <div className="logo-container">
-        <img 
-          src="/img/logo/logo.svg" 
-          alt="MonkeyPOS Logo" 
-          className="logo" 
+        <img
+          src="/img/logo/logo.svg"
+          alt="MonkeyPOS Logo"
+          className="logo"
           style={{ width: "150px" }}
         />
       </div>
@@ -32,22 +35,22 @@ export default function Sidebar() {
           <span className="material-symbols-outlined">point_of_sale</span>
           Terminal POS
         </Link>
-        
+
         <Link href="/products" className={`menu ${isActive("/products")}`}>
           <span className="material-symbols-outlined">inventory_2</span>
           Daftar Produk
         </Link>
-        
+
         <Link href="/history" className={`menu ${isActive("/history")}`}>
           <span className="material-symbols-outlined">history</span>
           Riwayat Penjualan
         </Link>
-        
+
         <Link href="/members" className={`menu ${isActive("/members")}`}>
           <span className="material-symbols-outlined">badge</span>
           Daftar Member
         </Link>
-        
+
         <Link href="/reports" className={`menu ${isActive("/reports")}`}>
           <span className="material-symbols-outlined">insert_chart</span>
           Laporan

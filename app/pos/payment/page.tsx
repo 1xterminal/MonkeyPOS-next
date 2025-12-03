@@ -16,6 +16,7 @@ export default function PaymentPage() {
     const [paymentMethod, setPaymentMethod] = useState("CASH");
     const [amountReceived, setAmountReceived] = useState<number | "">("");
     const [isLoading, setIsLoading] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false); // Modal State
 
     // State Kalkulasi
     const [subtotal, setSubtotal] = useState(0);
@@ -80,7 +81,6 @@ export default function PaymentPage() {
         const updatedCart = cart.map(item => {
             if (item.id === id) {
                 if (type === "plus") {
-                    // Harusnya cek stok lagi di sini idealnya, tapi utk simpel kita assume frontend validation cukup dulu
                     return { ...item, quantity: item.quantity + 1 };
                 } else {
                     return { ...item, quantity: item.quantity - 1 };
@@ -93,7 +93,6 @@ export default function PaymentPage() {
             router.push("/pos");
         } else {
             setCart(updatedCart);
-            // Update localStorage biar sinkron
             localStorage.setItem("currentOrder", JSON.stringify({ items: updatedCart }));
         }
     };
@@ -113,6 +112,8 @@ export default function PaymentPage() {
             userId: "user_id_placeholder", // Nanti diganti dengan Auth user asli
         };
 
+        setIsLoading(true);
+
         try {
             const response = await fetch("/api/transactions", {
                 method: "POST",
@@ -121,29 +122,27 @@ export default function PaymentPage() {
             });
 
             if (response.ok) {
-                const result = await response.json();
-                // Hapus cart lokal
+                // Sukses -> Tampilkan Modal
+                setShowSuccessModal(true);
                 localStorage.removeItem("currentOrder");
-                // Redirect ke Receipt (Nanti kita buat)
-                alert("Transaksi Berhasil! (Nanti redirect ke Receipt)");
-                // router.push(`/receipt/${result.id}`); 
-                router.push("/pos"); // Sementara balik ke POS dulu
             } else {
-                alert("Gagal menyimpan transaksi");
+                const errorData = await response.json();
+                alert(`Gagal menyimpan transaksi: ${errorData.error || "Unknown error"}`);
             }
         } catch (error) {
             console.error(error);
-            alert("Terjadi kesalahan sistem");
+            alert("Terjadi kesalahan sistem saat memproses transaksi.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
     // Validasi Tombol Bayar
-    // Validasi Tombol Bayar
     const isPayDisabled = (paymentMethod === "CASH" && (typeof amountReceived !== "number" || amountReceived < total)) || isLoading;
 
     return (
-        <div className="container-fluid h-100">
-            {/* Background Gradient Wrapper (Sama seperti Terminal CSS lama) */}
+        <div className="container-fluid h-100 position-relative">
+            {/* Background Gradient Wrapper */}
             <div className="row h-100 p-4" style={{ background: "linear-gradient(180deg, #FFFBE7, #FDF0CB)", borderRadius: "12px" }}>
 
                 {/* === KIRI: RINCIAN PESANAN === */}
@@ -165,7 +164,6 @@ export default function PaymentPage() {
                                         <div className="fw-bold text-end" style={{ width: "100px" }}>
                                             {formatRupiah(item.price * item.quantity)}
                                         </div>
-                                        {/* Tombol Hapus */}
                                         <button className="remove-btn" onClick={() => {
                                             const newCart = cart.filter(c => c.id !== item.id);
                                             if (newCart.length === 0) router.push("/pos");
@@ -180,15 +178,12 @@ export default function PaymentPage() {
                         <div className="mt-auto pt-3 border-top">
                             <div className="d-flex justify-content-between mb-2"><span>Subtotal</span><span>{formatRupiah(subtotal)}</span></div>
                             <div className="d-flex justify-content-between mb-2"><span>Pajak (11%)</span><span>{formatRupiah(tax)}</span></div>
-
-                            {/* Baris Diskon (Muncul hanya jika member dipilih) */}
                             {selectedMember && (
                                 <div className="d-flex justify-content-between mb-2 text-success fw-bold">
                                     <span>Diskon Member (5%)</span>
                                     <span>- {formatRupiah(discount)}</span>
                                 </div>
                             )}
-
                             <div className="d-flex justify-content-between mt-3 pt-2 border-top fs-4 fw-bold text-monkey-dark">
                                 <span>Grand Total</span>
                                 <span>{formatRupiah(total)}</span>
@@ -242,11 +237,19 @@ export default function PaymentPage() {
                                 <label className="fw-bold mb-2">Uang Diterima</label>
                                 <input
                                     type="number"
-                                    className="form-control input-monkey fs-5"
+                                    className="form-control input-monkey fs-5 mb-2"
                                     placeholder="Rp 0"
                                     value={amountReceived}
                                     onChange={(e) => setAmountReceived(e.target.value ? parseFloat(e.target.value) : "")}
                                 />
+                                {/* Quick Cash Buttons */}
+                                <div className="d-flex gap-2 mb-3 overflow-auto pb-1">
+                                    <button className="btn btn-sm btn-outline-secondary" onClick={() => setAmountReceived(total)}>Uang Pas</button>
+                                    <button className="btn btn-sm btn-outline-secondary" onClick={() => setAmountReceived(20000)}>20k</button>
+                                    <button className="btn btn-sm btn-outline-secondary" onClick={() => setAmountReceived(50000)}>50k</button>
+                                    <button className="btn btn-sm btn-outline-secondary" onClick={() => setAmountReceived(100000)}>100k</button>
+                                </div>
+
                                 <div className="d-flex justify-content-between mt-3 align-items-center">
                                     <span>{change < 0 ? "Kurang" : "Kembalian"}</span>
                                     <span className={`fs-4 fw-bold ${change < 0 ? "text-danger" : "text-success"}`}>
@@ -264,7 +267,7 @@ export default function PaymentPage() {
                                 disabled={isPayDisabled}
                                 onClick={handleCompleteSale}
                             >
-                                Selesaikan Penjualan
+                                {isLoading ? "Memproses..." : "Selesaikan Penjualan"}
                             </button>
                         </div>
 
@@ -272,6 +275,36 @@ export default function PaymentPage() {
                 </div>
 
             </div>
+
+            {/* === SUCCESS MODAL === */}
+            {showSuccessModal && (
+                <div className="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center" style={{ background: "rgba(0,0,0,0.5)", zIndex: 1050 }}>
+                    <div className="bg-white p-5 rounded-4 shadow-lg text-center" style={{ maxWidth: "400px", width: "90%" }}>
+                        <div className="mb-3 text-success">
+                            <span className="material-symbols-outlined" style={{ fontSize: "80px" }}>check_circle</span>
+                        </div>
+                        <h2 className="fw-bold mb-2">Transaksi Berhasil!</h2>
+                        <p className="text-muted mb-4">Pembayaran telah diterima.</p>
+
+                        {paymentMethod === "CASH" && (
+                            <div className="bg-light p-3 rounded mb-4">
+                                <div className="small text-muted">Kembalian</div>
+                                <div className="fs-2 fw-bold text-success">{formatRupiah(change)}</div>
+                            </div>
+                        )}
+
+                        <div className="d-flex flex-column gap-2">
+                            <button className="btn btn-outline-dark py-2 fw-bold" onClick={() => alert("Fitur Cetak Struk akan segera hadir!")}>
+                                <span className="material-symbols-outlined align-middle me-2">print</span>
+                                Cetak Struk
+                            </button>
+                            <button className="btn btn-monkey py-2 fw-bold" onClick={() => router.push("/pos")}>
+                                Transaksi Baru
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
