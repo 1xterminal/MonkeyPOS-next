@@ -14,21 +14,16 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// --- ENUMS ---
-// Enums help ensure data consistency (no typos like "admin" vs "Admin")
-
 enum Role {
   ADMIN
   CASHIER
 }
 
 enum PaymentMethod {
-  CASH
-  QRIS
-  DEBIT
+  CASH 
+  CARD 
+  E_WALLET
 }
-
-// --- MODELS ---
 
 model User {
   id        String   @id @default(cuid())
@@ -44,9 +39,9 @@ model User {
 }
 
 model Category {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  products  Product[] // A category has many products
+  id        Int         @id @default(autoincrement())
+  name      String 
+  products  Product[]
 }
 
 model Product {
@@ -92,6 +87,8 @@ model Transaction {
   change        Int
 
   paymentMethod PaymentMethod
+  cashReceived  Decimal
+  changeAmount  Decimal
   createdAt     DateTime      @default(now())
 
   // Relations
