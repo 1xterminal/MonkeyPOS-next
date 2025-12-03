@@ -9,7 +9,6 @@
     "lint": "eslint"
   },
   "dependencies": {
-    "@prisma/client": "^6.17.1",
     "@prisma/extension-accelerate": "^2.0.2",
     "bcryptjs": "^3.0.3",
     "bootstrap": "^5.3.8",
@@ -21,6 +20,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@prisma/client": "^6.17.1",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "19.2.2",
@@ -36,6 +36,6 @@
     "@types/react-dom": "19.2.2"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "prisma/seed.ts"
   }
 }
