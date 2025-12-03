@@ -184,23 +184,23 @@ export default function POSTerminal() {
               </div>
             </div>
 
-            {/* Product Grid */}
-            <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 overflow-auto" style={{ maxHeight: "calc(100vh - 300px)" }}>
-              {isLoading ? (
-                <div className="col-12 text-center mt-5">
-                  <div className="spinner-border text-warning" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                  </div>
-                  <p className="mt-2 text-muted">Memuat produk dari database...</p>
+            {/* Product Grid Area */}
+            {isLoading ? (
+              <div className="flex-grow-1 d-flex flex-column justify-content-center align-items-center text-center">
+                <div className="spinner-border text-warning" role="status">
+                  <span className="visually-hidden">Loading...</span>
                 </div>
-              ) : filteredProducts.length === 0 ? (
-                <div className="col-12 text-center mt-5" style={{ color: "#aaa" }}>
-                  <span className="material-symbols-outlined" style={{ fontSize: "80px", marginBottom: "16px" }}>sentiment_dissatisfied</span>
-                  <p className="fs-4 fw-bold mb-1" style={{ color: "#888" }}>Produk Tidak Ditemukan</p>
-                  <span>Coba cari kata kunci lain atau ganti kategori.</span>
-                </div>
-              ) : (
-                filteredProducts.map((product) => (
+                <p className="mt-2 text-muted">Memuat produk dari database...</p>
+              </div>
+            ) : filteredProducts.length === 0 ? (
+              <div className="flex-grow-1 d-flex flex-column justify-content-center align-items-center text-center" style={{ color: "#aaa" }}>
+                <span className="material-symbols-outlined" style={{ fontSize: "80px", marginBottom: "16px" }}>sentiment_dissatisfied</span>
+                <p className="fs-4 fw-bold mb-1" style={{ color: "#888" }}>Produk Tidak Ditemukan</p>
+                <span>Coba cari kata kunci lain atau ganti kategori.</span>
+              </div>
+            ) : (
+              <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 overflow-auto flex-grow-1" style={{ minHeight: "0", alignContent: "flex-start" }}>
+                {filteredProducts.map((product) => (
                   <div key={product.id} className="col">
                     <div
                       className="card card-monkey h-100 p-3 text-center cursor-pointer"
@@ -225,9 +225,9 @@ export default function POSTerminal() {
                       </div>
                     </div>
                   </div>
-                ))
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 

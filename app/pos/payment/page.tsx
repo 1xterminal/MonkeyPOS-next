@@ -243,11 +243,55 @@ export default function PaymentPage() {
                                     onChange={(e) => setAmountReceived(e.target.value ? parseFloat(e.target.value) : "")}
                                 />
                                 {/* Quick Cash Buttons */}
-                                <div className="d-flex gap-2 mb-3 overflow-auto pb-1">
-                                    <button className="btn btn-sm btn-outline-secondary" onClick={() => setAmountReceived(total)}>Uang Pas</button>
-                                    <button className="btn btn-sm btn-outline-secondary" onClick={() => setAmountReceived(20000)}>20k</button>
-                                    <button className="btn btn-sm btn-outline-secondary" onClick={() => setAmountReceived(50000)}>50k</button>
-                                    <button className="btn btn-sm btn-outline-secondary" onClick={() => setAmountReceived(100000)}>100k</button>
+                                <div className="d-flex gap-2 mb-3 justify-content-between">
+                                    <button
+                                        className="btn flex-grow-1 fw-bold"
+                                        onClick={() => setAmountReceived(total)}
+                                        style={{
+                                            border: "2px solid #EFCE9E",
+                                            color: "#856404",
+                                            background: amountReceived === total ? "#FFFBE7" : "white",
+                                            borderRadius: "10px"
+                                        }}
+                                    >
+                                        Uang Pas
+                                    </button>
+                                    <button
+                                        className="btn flex-grow-1 fw-bold"
+                                        onClick={() => setAmountReceived(20000)}
+                                        style={{
+                                            border: "2px solid #EFCE9E",
+                                            color: "#856404",
+                                            background: amountReceived === 20000 ? "#FFFBE7" : "white",
+                                            borderRadius: "10px"
+                                        }}
+                                    >
+                                        20k
+                                    </button>
+                                    <button
+                                        className="btn flex-grow-1 fw-bold"
+                                        onClick={() => setAmountReceived(50000)}
+                                        style={{
+                                            border: "2px solid #EFCE9E",
+                                            color: "#856404",
+                                            background: amountReceived === 50000 ? "#FFFBE7" : "white",
+                                            borderRadius: "10px"
+                                        }}
+                                    >
+                                        50k
+                                    </button>
+                                    <button
+                                        className="btn flex-grow-1 fw-bold"
+                                        onClick={() => setAmountReceived(100000)}
+                                        style={{
+                                            border: "2px solid #EFCE9E",
+                                            color: "#856404",
+                                            background: amountReceived === 100000 ? "#FFFBE7" : "white",
+                                            borderRadius: "10px"
+                                        }}
+                                    >
+                                        100k
+                                    </button>
                                 </div>
 
                                 <div className="d-flex justify-content-between mt-3 align-items-center">
