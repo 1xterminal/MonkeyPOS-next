@@ -1,7 +1,7 @@
 /* app/globals.css */
 
 /* =========================================
-   1. LEGACY VARIABLES & BASE STYLES (DARI KAMU)
+   1. LEGACY VARIABLES & BASE STYLES
    ========================================= */
 :root {
   /* primary colors */
@@ -45,28 +45,14 @@
 /* body styling */
 body {
   font-family: var(--font-family);
-  background-color: var(--color-background-offset); /* Menggunakan offset agar tidak putih polos */
+  background-color: var(--color-background-offset);
   color: var(--color-text);
   line-height: 1.5;
   min-height: 100vh;
 }
 
-/* --- main app layout (Legacy Classes) --- */
-/* Kita pertahankan ini kalau-kalau kamu pakai div biasa tanpa grid Bootstrap */
-.container-custom { /* Saya ubah nama jadi container-custom agar tidak bentrok dengan .container Bootstrap */
-  display: flex;
-  height: 100%;
-  gap: 24px;
-}
-
-.content {
-  flex: 1;
-  padding: 24px;
-}
-
 /* =========================================
    2. BOOTSTRAP OVERRIDES & CUSTOM COMPONENTS
-   (Agar Bootstrap terlihat seperti MonkeyPOS)
    ========================================= */
 
 /* Custom Card MonkeyPOS */
@@ -108,7 +94,7 @@ body {
 
 /* Custom Input Search */
 .input-monkey {
-  background-color: #FFFBE7; /* Warna kekuningan agar sesuai tema */
+  background-color: #FFFBE7;
   border: 1px solid #ccc;
   border-radius: 8px;
   color: var(--color-text);
@@ -162,8 +148,94 @@ body {
   background: #d93636;
 }
 
-/* Utility: Background Gradient (Untuk Sidebar) */
-.bg-monkey-gradient {
-  background: linear-gradient(180deg, #FFFBE7, #FDF0CB);
+/* =========================================
+   3. SIDEBAR STYLING (LEGACY PORT)
+   Ini yang belum ada di file kamu sebelumnya
+   ========================================= */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 260px; /* Lebar tetap sidebar */
+  height: 100%;
+  box-sizing: border-box;
   color: var(--color-text);
+  
+  /* Gradient Background MonkeyPOS */
+  background: linear-gradient(
+      180deg,
+      #FFFBE7, #FDF0CB
+  );
+
+  border: 1px solid rgba(228, 157, 0, 0.5);
+  border-radius: 16px;
+
+  /* Shadow agar terlihat mengambang */
+  box-shadow:
+      0 2px 10px hsla(0 0% 0 / .1),
+      0 2px 20px hsla(0 0% 0 / .1);
+  
+  /* Jarak kanan agar tidak menempel konten */
+  margin-right: 24px; 
+}
+
+.sidebar .logo-container {
+  display: flex;
+  box-sizing: border-box;
+  padding: 20px;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.sidebar .logo {
+  max-width: 100%;
+  height: auto;
+}
+
+.sidebar .menus {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 0 10px;
+}
+
+.sidebar .menus.center {
+  flex: 1;
+  margin-top: 10px;
+}
+
+.sidebar .menus.bottom {
+  margin-top: auto;
+  padding-bottom: 20px;
+}
+
+.sidebar .menu {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 16px;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--color-text);
+  font-weight: 500;
+  transition: .2s ease-out;
+  margin-bottom: 4px;
+}
+
+.sidebar .menu .material-symbols-outlined {
+  font-size: 24px;
+}
+
+/* Hover State */
+.sidebar .menu:hover:not(.active) {
+  background: rgba(254, 186, 0, 0.15);
+  color: var(--color-text);
+}
+
+/* Active State */
+.sidebar .menu.active {
+  background-color: var(--color-primary);
+  color: var(--color-text);
+  border: 2px solid var(--color-primary-shadow);
+  font-weight: 700;
+  cursor: default;
 }
