@@ -11,7 +11,9 @@ interface Product {
   price: number;
   image: string | null; // Bisa null kalau dari database belum ada gambar
   stock: number;
-  category?: string;
+  category?: {
+    name: string;
+  };
 }
 
 interface CartItem extends Product {
@@ -25,6 +27,8 @@ export default function POSTerminal() {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [categories, setCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState("Semua");
 
   // --- 2. FETCH DATA DARI API (BAGIAN BARU) ---
   useEffect(() => {
@@ -32,10 +36,15 @@ export default function POSTerminal() {
       try {
         const response = await fetch("/api/products");
         if (!response.ok) throw new Error("Gagal mengambil data produk");
-        
+
         const data = await response.json();
         setProducts(data);
         setFilteredProducts(data);
+
+        // Extract Unique Categories
+        const uniqueCategories = Array.from(new Set(data.map((p: any) => p.category?.name || "Lainnya"))) as string[];
+        setCategories(["Semua", ...uniqueCategories]);
+
       } catch (error) {
         console.error("Error fetching products:", error);
         alert("Gagal memuat produk dari database.");
@@ -47,14 +56,25 @@ export default function POSTerminal() {
     fetchProducts();
   }, []);
 
-  // --- 3. Logic Search ---
+  // --- 3. Logic Search & Filter Category ---
   useEffect(() => {
-    const filtered = products.filter((p) =>
-      p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.sku.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    let filtered = products;
+
+    // Filter by Category
+    if (selectedCategory !== "Semua") {
+      filtered = filtered.filter((p: any) => (p.category?.name || "Lainnya") === selectedCategory);
+    }
+
+    // Filter by Search Query
+    if (searchQuery) {
+      filtered = filtered.filter((p) =>
+        p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.sku.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
     setFilteredProducts(filtered);
-  }, [searchQuery, products]);
+  }, [searchQuery, selectedCategory, products]);
 
   // --- 4. Helper Format Rupiah ---
   const formatRupiah = (num: number) => {
@@ -132,24 +152,40 @@ export default function POSTerminal() {
   return (
     <div className="container-fluid h-100">
       <div className="row h-100">
-        
+
         {/* === BAGIAN KIRI: PRODUK === */}
         <div className="col-md-8 p-3">
           <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column">
             {/* Header & Search */}
             <div className="mb-4">
               <h1 className="fw-bold mb-3" style={{ fontSize: "2.2rem", borderBottom: "3px solid #EFCE9E", paddingBottom: "8px" }}>Pilih Produk</h1>
-              <input
-                type="text"
-                className="form-control input-monkey py-2"
-                placeholder="Cari produk berdasarkan nama atau SKU..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
+              <div className="d-flex gap-3">
+                <input
+                  type="text"
+                  className="form-control input-monkey py-2"
+                  placeholder="Cari produk..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+
+              {/* Category Tabs */}
+              <div className="d-flex gap-2 mt-3 overflow-auto pb-2">
+                {categories.map((cat) => (
+                  <button
+                    key={cat}
+                    className={`btn rounded-pill px-4 fw-bold ${selectedCategory === cat ? "btn-warning text-dark" : "btn-light text-muted border"}`}
+                    onClick={() => setSelectedCategory(cat)}
+                    style={{ whiteSpace: "nowrap" }}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Product Grid */}
-            <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 overflow-auto" style={{ maxHeight: "calc(100vh - 250px)" }}>
+            <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 overflow-auto" style={{ maxHeight: "calc(100vh - 300px)" }}>
               {isLoading ? (
                 <div className="col-12 text-center mt-5">
                   <div className="spinner-border text-warning" role="status">
@@ -160,22 +196,22 @@ export default function POSTerminal() {
               ) : filteredProducts.length === 0 ? (
                 <div className="col-12 text-center mt-5" style={{ color: "#aaa" }}>
                   <span className="material-symbols-outlined" style={{ fontSize: "80px", marginBottom: "16px" }}>sentiment_dissatisfied</span>
-                  <p className="fs-4 fw-bold mb-1" style={{ color: "#888" }}>Belum Ada Produk</p>
-                  <span>Coba cari kata kunci lain atau tambahkan produk di database.</span>
+                  <p className="fs-4 fw-bold mb-1" style={{ color: "#888" }}>Produk Tidak Ditemukan</p>
+                  <span>Coba cari kata kunci lain atau ganti kategori.</span>
                 </div>
               ) : (
                 filteredProducts.map((product) => (
                   <div key={product.id} className="col">
-                    <div 
+                    <div
                       className="card card-monkey h-100 p-3 text-center cursor-pointer"
                       onClick={() => addToCart(product)}
                       style={{ cursor: "pointer" }}
                     >
                       <div style={{ height: "110px", width: "100%", overflow: "hidden", borderRadius: "8px", backgroundColor: "#f0f0f0" }}>
                         {/* Fallback image karena di database 'image' masih null */}
-                        <img 
-                          src={product.image || "https://placehold.co/150x110?text=No+Img"} 
-                          alt={product.name} 
+                        <img
+                          src={product.image || "https://placehold.co/150x110?text=No+Img"}
+                          alt={product.name}
                           style={{ width: "100%", height: "100%", objectFit: "cover" }}
                           onError={(e) => (e.currentTarget.src = "https://placehold.co/150x110?text=Error")}
                         />
@@ -217,7 +253,7 @@ export default function POSTerminal() {
                         <div className="fw-bold">{item.name}</div>
                         <div className="small text-muted">{formatRupiah(item.price)}</div>
                       </div>
-                      
+
                       <div className="d-flex align-items-center gap-2">
                         <button className="qty-btn" onClick={() => updateQuantity(item.id, "minus")}>-</button>
                         <span className="fw-bold text-center" style={{ minWidth: "30px" }}>{item.quantity}</span>
@@ -245,8 +281,8 @@ export default function POSTerminal() {
                 <span>{formatRupiah(total)}</span>
               </div>
 
-              <Link 
-                href={cart.length === 0 ? "#" : "/pos/payment"} 
+              <Link
+                href={cart.length === 0 ? "#" : "/pos/payment"}
                 className={`btn btn-monkey w-100 py-3 fs-5 ${cart.length === 0 ? "disabled" : ""}`}
                 onClick={cart.length === 0 ? (e) => e.preventDefault() : handleCheckout}
               >

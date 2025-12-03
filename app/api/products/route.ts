@@ -7,6 +7,9 @@ export async function GET() {
   try {
     // Ambil semua produk dari database
     const products = await prisma.product.findMany({
+      include: {
+        category: true, // Include Category Data
+      },
       orderBy: {
         name: 'asc', // Urutkan berdasarkan nama A-Z
       },
