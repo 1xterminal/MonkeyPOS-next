@@ -14,98 +14,74 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// --- ENUMS ---
-// Enums help ensure data consistency (no typos like "admin" vs "Admin")
-
 enum Role {
   ADMIN
   CASHIER
 }
 
 enum PaymentMethod {
-  CASH
-  QRIS
-  DEBIT
+  CASH 
+  CARD 
+  E_WALLET
 }
 
-// --- MODELS ---
-
 model User {
-  id        String   @id @default(cuid())
-  username  String   @unique // For login (e.g., "EMP001")
-  password  String   // Will store Hashed Password
-  name      String
-  role      Role     @default(CASHIER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  sales     Sale[]   // A user (cashier) can perform many sales
+  id              Int           @id @default(uuid())
+  employeeId      String        @unique
+  password        String      
+  role            Role          @default(CASHIER)
+  createdAt       DateTime     @default(now())
+  transactions    Transaction[]
 }
 
 model Category {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  products  Product[] // A category has many products
+  id        Int         @id @default(autoincrement())
+  name      String 
+  products  Product[]
 }
 
 model Product {
-  id          String   @id @default(cuid())
-  sku         String   @unique // Barcode/Unique Code
-  name        String
-  description String?
-  price       Int      // Store in IDR (e.g. 15000). Avoid Float for money!
-  stock       Int      @default(0)
-  image       String?  // URL to image if you add upload feature later
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  // Relations
-  categoryId  String?
-  category    Category?  @relation(fields: [categoryId], references: [id])
-  saleItems   SaleItem[] // A product can be sold many times
+  id          Int         @id @default(autoincrement())
+  sku         String      @unique
+  name        String 
+  price       Decimal 
+  stock       Int 
+  categoryId  Int
+  category    Category    @relation(fields: [categoryId], references: [id])
+  soldItems   TransactionItem[]
 }
 
 model Member {
-  id        String   @id @default(cuid())
-  name      String
-  phone     String   @unique
-  email     String?
-  points    Int      @default(0) // For "Should Have" loyalty features
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  sales     Sale[]   // A member can make many purchases
+  id            Int           @id @default(autoincrement())
+  name          String 
+  phone         String 
+  email         String
+  transactions  Transaction[]
 }
 
-model Sale {
-  id            String        @id @default(cuid())
-  invoiceId     String        @unique // e.g., "INV-20251017-001"
-  total         Int
+model Transaction {
+  id            Int           @id @default(autoincrement())
+  displayId     String        @unique
+  subtotal      Decimal 
+  tax           Decimal 
+  totalAmount   Decimal
   paymentMethod PaymentMethod
+  cashReceived  Decimal
+  changeAmount  Decimal
   createdAt     DateTime      @default(now())
-
-  // Relations
-  cashierId     String
-  cashier       User          @relation(fields: [cashierId], references: [id])
-  
-  memberId      String?
-  member        Member?       @relation(fields: [memberId], references: [id])
-
-  items         SaleItem[]
+  userId        Int
+  user          User          @relation(fields: [userId], references: [id])
+  memberId      Int
+  member        Member        @relation(fields: [memberId], references: [id])
+  items         TransactionItem[]
 }
 
-model SaleItem {
-  id        String  @id @default(cuid())
-  quantity  Int
-  price     Int     // IMPORTANT: Store the price AT THE TIME OF SALE. 
-                      // If product price changes later, history must remain accurate.
-  
-  // Relations
-  saleId    String
-  sale      Sale    @relation(fields: [saleId], references: [id], onDelete: Cascade)
-  
-  productId String
-  product   Product @relation(fields: [productId], references: [id])
+model TransactionItem {
+  id            Int           @id @default(autoincrement())
+  quantity      Int 
+  priceAtSale   Decimal
+  transactionId Int
+  transaction   Transaction   @relation(fields: [transactionId], references: [id])
+  productId     Int
+  product       Product       @relation(fields: [productId], references: [id])
 }
