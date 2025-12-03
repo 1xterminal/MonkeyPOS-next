@@ -38,6 +38,17 @@
     box-shadow: 0 3px 12px 0 rgba(185, 136, 1, 0.5);
 }
 
+.primary {
+    background-color: var(--color-primary);
+    border-color: var(--color-primary-shadow);
+    box-shadow: 0 2px 8px 0 rgba(185, 136, 1, 0.25);
+}
+
+.primary:hover {
+    background-color: var(--color-primary-shadow);
+    box-shadow: 0 3px 12px 0 rgba(185, 136, 1, 0.5);
+}
+
 .flat {
     background-color: transparent;
     box-shadow: none;

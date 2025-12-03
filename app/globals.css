@@ -155,27 +155,26 @@ body {
 .sidebar {
   display: flex;
   flex-direction: column;
-  width: 260px; /* Lebar tetap sidebar */
+  width: 260px;
+  /* Lebar tetap sidebar */
   height: 100%;
   box-sizing: border-box;
   color: var(--color-text);
-  
+
   /* Gradient Background MonkeyPOS */
-  background: linear-gradient(
-      180deg,
-      #FFFBE7, #FDF0CB
-  );
+  background: linear-gradient(180deg,
+      #FFFBE7, #FDF0CB);
 
   border: 1px solid rgba(228, 157, 0, 0.5);
   border-radius: 16px;
 
   /* Shadow agar terlihat mengambang */
   box-shadow:
-      0 2px 10px hsla(0 0% 0 / .1),
-      0 2px 20px hsla(0 0% 0 / .1);
-  
+    0 2px 10px hsla(0 0% 0 / .1),
+    0 2px 20px hsla(0 0% 0 / .1);
+
   /* Jarak kanan agar tidak menempel konten */
-  margin-right: 24px; 
+  margin-right: 24px;
 }
 
 .sidebar .logo-container {
