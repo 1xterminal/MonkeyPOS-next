@@ -13,7 +13,7 @@ export default function PaymentPage() {
 
     // State Input
     const [selectedMember, setSelectedMember] = useState("");
-    const [paymentMethod, setPaymentMethod] = useState("cash");
+    const [paymentMethod, setPaymentMethod] = useState("CASH");
     const [amountReceived, setAmountReceived] = useState<number | "">("");
     const [isLoading, setIsLoading] = useState(false);
 
@@ -63,7 +63,7 @@ export default function PaymentPage() {
 
     // 3. Kalkulasi Kembalian
     useEffect(() => {
-        if (paymentMethod === "cash" && typeof amountReceived === "number") {
+        if (paymentMethod === "CASH" && typeof amountReceived === "number") {
             setChange(amountReceived - total);
         } else {
             setChange(0);
@@ -106,8 +106,8 @@ export default function PaymentPage() {
             tax,
             discount,
             paymentMethod,
-            amountReceived: paymentMethod === "cash" ? Number(amountReceived) : total,
-            change: paymentMethod === "cash" ? change : 0,
+            amountReceived: paymentMethod === "CASH" ? Number(amountReceived) : total,
+            change: paymentMethod === "CASH" ? change : 0,
             items: cart,
             memberId: selectedMember || null,
             userId: "user_id_placeholder", // Nanti diganti dengan Auth user asli
@@ -139,7 +139,7 @@ export default function PaymentPage() {
 
     // Validasi Tombol Bayar
     // Validasi Tombol Bayar
-    const isPayDisabled = (paymentMethod === "cash" && (typeof amountReceived !== "number" || amountReceived < total)) || isLoading;
+    const isPayDisabled = (paymentMethod === "CASH" && (typeof amountReceived !== "number" || amountReceived < total)) || isLoading;
 
     return (
         <div className="container-fluid h-100">
@@ -220,7 +220,7 @@ export default function PaymentPage() {
                         <div className="mb-4">
                             <h3 className="fw-bold pb-2 mb-3 border-bottom border-warning" style={{ fontSize: "1.5rem" }}>Metode Pembayaran</h3>
                             <div className="d-flex flex-column gap-2">
-                                {["cash", "card", "ewallet"].map((method) => (
+                                {["CASH", "CARD", "E_WALLET"].map((method) => (
                                     <label key={method} className={`btn btn-outline-warning text-dark text-start fw-bold ${paymentMethod === method ? "active bg-warning" : "bg-white"}`} style={{ border: "2px solid #EFCE9E" }}>
                                         <input
                                             type="radio"
@@ -230,14 +230,14 @@ export default function PaymentPage() {
                                             checked={paymentMethod === method}
                                             onChange={() => setPaymentMethod(method)}
                                         />
-                                        {method === "cash" ? "Tunai" : method === "card" ? "Kartu Kredit/Debit" : "E-Wallet (QRIS)"}
+                                        {method === "CASH" ? "Tunai" : method === "CARD" ? "Kartu Kredit/Debit" : "E-Wallet (QRIS)"}
                                     </label>
                                 ))}
                             </div>
                         </div>
 
                         {/* 3. Input Uang (Khusus Cash) */}
-                        {paymentMethod === "cash" && (
+                        {paymentMethod === "CASH" && (
                             <div className="mb-4 bg-light p-3 rounded border">
                                 <label className="fw-bold mb-2">Uang Diterima</label>
                                 <input
