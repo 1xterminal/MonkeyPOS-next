@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/app/components/ui/Button';
 import { Input } from '@/app/components/ui/Input';
-import { createMember } from '@/(app)/members/actions';
+import { createMember } from '@/app/(app)/members/actions';
 
 interface AddMemberDialogProps {
     isOpen: boolean;

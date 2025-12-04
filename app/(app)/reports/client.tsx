@@ -1,6 +1,6 @@
 'use client';
 
-import TableComponent from '@/components/ui/Table';
+import TableComponent from '@/app/components/ui/Table';
 import { useEffect, useState } from 'react';
 
 interface TransactionItem {

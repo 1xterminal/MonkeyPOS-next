@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '@/app/components/ui/Button';
 import { Input } from '@/app/components/ui/Input';
-import { updateMember } from '@/(app)/members/actions';
+import { updateMember } from '@/app/(app)/members/actions';
 
 interface Member {
     id: string;

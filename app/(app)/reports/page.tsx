@@ -1,4 +1,4 @@
-import Header from '@/components/ui/Header';
+import Header from '@/app/components/ui/Header';
 
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';

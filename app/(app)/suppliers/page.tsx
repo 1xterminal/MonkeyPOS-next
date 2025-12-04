@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Header from '@/components/ui/Header';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import Header from '@/app/components/ui/Header';
+import { Button } from '@/app/components/ui/Button';
+import { Input } from '@/app/components/ui/Input';
 import styles from './Suppliers.module.css';
 
 interface Supplier {

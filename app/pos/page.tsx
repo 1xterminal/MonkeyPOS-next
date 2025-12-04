@@ -4,10 +4,10 @@ import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { formatRupiah } from "@/lib/formatters";
-import { Product } from "@/types";
+import { CartItem, Product } from "@/types";
 import { useCart } from "@/hooks/useCart";
-import ProductCard from "@/components/pos/ProductCard";
-import CartItemRow from "@/components/pos/CartItemRow";
+// import ProductCard from "@/components/pos/ProductCard";
+// import CartItemRow from "@/components/pos/CartItemRow";
 import { Button } from "@/app/components/ui/Button";
 import Header from "../components/ui/Header";
 import { useRouter } from "next/navigation";
@@ -26,6 +26,8 @@ export default function POSTerminal() {
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [discount, setDiscount] = useState(0);
+
+  const { addToCart, removeFromCart, updateQuantity, subtotal, tax, total } = useCart();
 
   // --- 2. FETCH DATA API ---
   useEffect(() => {
