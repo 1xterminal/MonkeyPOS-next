@@ -4,6 +4,7 @@ import { useState, FormEvent, ChangeEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './ProductAdd.module.css';
 import { createProduct } from '../actions';
+import Header from '@/app/components/Header';
 
 interface Product {
     name: string;
@@ -88,7 +89,7 @@ export default function ProductAddPage() {
     return (
         <>
             <div className={styles.productAddContent}>
-                <div className={styles.headerActions}>
+                {/* <div className={styles.headerActions}>
                     <div className={styles.rightBox}>
                         <div className={styles.userProfile}>
                             <span className="material-symbols-outlined">person</span>
@@ -104,8 +105,9 @@ export default function ProductAddPage() {
                             <span className="material-symbols-outlined">logout</span>
                         </button>
                     </div>
-                </div>
-                <h1>Tambahkan Produk Baru</h1>
+                </div> */}
+                {/* <h1>Tambahkan Produk Baru</h1> */}
+                <Header title="Tambahkan Produk Baru"/>
                 <form id="product-add-form" className={styles.productAddForm} onSubmit={handleSubmit}>
                     <div className={styles.formGroup}>
                         <label htmlFor="product-name">Nama Produk</label>
