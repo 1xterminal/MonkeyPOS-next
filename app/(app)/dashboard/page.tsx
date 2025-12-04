@@ -45,8 +45,9 @@ export default function DashboardPage() {
     };
 
     return (
-        <div className="container-fluid p-4">
-            <h1 className="fw-bold mb-4">Dashboard</h1>
+        <div>
+            <Header title="Dashboard"/>
+            {/* <h1 className="fw-bold mb-4">Dashboard</h1> */}
 
             {/* Stats Cards */}
             <div className="row g-4 mb-4">

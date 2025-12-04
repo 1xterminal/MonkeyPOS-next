@@ -352,4 +352,6 @@ export default function POSTerminal() {
       {/* </div> */}
     </div>
   );
+</div>
+  );
 }

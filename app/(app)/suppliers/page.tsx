@@ -114,9 +114,9 @@ export default function SuppliersPage() {
     };
 
     return (
-        <div className="p-3 h-100">
-            <Header />
-            <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column">
+        <div className="h-100">
+            <Header title="Daftar Supplier" />
+            <div className="h-100 d-flex flex-column">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                     <Button onClick={() => openModal()}>Tambahkan Supplier Baru</Button>
                 </div>

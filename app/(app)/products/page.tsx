@@ -143,8 +143,8 @@ function ProductsContent() {
     ];
 
     return (
-        <div className="p-3 h-100">
-            <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column overflow-hidden">
+        <div className="h-100">
+            <div className="h-100 d-flex flex-column overflow-hidden">
                 <Header title='Daftar Produk'/>
 
                 <div className="d-flex flex-column flex-grow-1 gap-3" style={{ minHeight: 0 }}>
