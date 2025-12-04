@@ -37,9 +37,9 @@ export default async function ReportsPage() {
     const userData = await getUserData();
 
     return <>
-        <Header title="Laporan Kinerja Kasir"/>
+        <Header title="Laporan Kinerja Kasir" />
         <Suspense fallback={<div>Loading...</div>}>
-            <ReportsClient userId={userData?.id} userName={userData?.name}/>
+            <ReportsClient userId={userData?.id} userName={userData?.name} />
         </Suspense>
     </>
 }

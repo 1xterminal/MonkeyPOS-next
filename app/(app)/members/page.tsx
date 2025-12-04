@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import Header from '@/app/components/ui/Header';
-import TableComponent, { Column, Action } from '@/app/components/ui/Table';
-import { Button } from '@/app/components/ui/Button';
-import { Input } from '@/app/components/ui/Input';
+import Header from '@/components/ui/Header';
+import TableComponent, { Column, Action } from '@/components/ui/Table';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { deleteMember } from './actions';
-import AddMemberDialog from '@/app/components/members/AddMemberDialog';
-import EditMemberDialog from '@/app/components/members/EditMemberDialog';
+import AddMemberDialog from '@/components/members/AddMemberDialog';
+import EditMemberDialog from '@/components/members/EditMemberDialog';
 
 interface Member {
     id: string;
@@ -139,7 +139,7 @@ function MembersContent() {
     return (
         <div className="p-3 h-100">
             <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column overflow-hidden">
-                <Header title="Daftar Member" />
+                <Header />
 
                 <div className="d-flex flex-column flex-grow-1 gap-3" style={{ minHeight: 0 }}>
                     <div className="d-flex justify-content-between align-items-center flex-shrink-0 w-100">

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './SalesHistory.module.css';
-import Header from '@/app/components/ui/Header';
+import Header from '@/components/Header';
 
 // Types matching Prisma schema
 interface TransactionItem {
@@ -207,7 +207,8 @@ export default function SalesHistoryPage() {
 
     return (
         <>
-            <Header title="Riwayat Penjualan"/>
+            {/* <h1>Riwayat Penjualan</h1> */}
+            <Header title="Riwayat Penjualan" />
 
             {/* Filter & Search */}
             <div className={styles.filterBox}>

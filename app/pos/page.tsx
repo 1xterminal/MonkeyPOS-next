@@ -2,20 +2,27 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import toast from "react-hot-toast";
-import { formatRupiah } from "@/lib/formatters";
-import { Product } from "@/types";
-import { useCart } from "@/hooks/useCart";
-import ProductCard from "@/components/pos/ProductCard";
-import CartItemRow from "@/components/pos/CartItemRow";
-import { Button } from "@/app/components/ui/Button";
-import Header from "../components/ui/Header";
-import { useRouter } from "next/navigation";
+import toast from "react-hot-toast"; // Import Toast
+
+// 1. Tipe Data
+interface Product {
+  id: string;
+  name: string;
+  sku: string;
+  price: number;
+  image: string | null;
+  stock: number;
+  category?: {
+    name: string;
+  };
+}
+
+interface CartItem extends Product {
+  quantity: number;
+}
 
 export default function POSTerminal() {
   const searchInputRef = useRef<HTMLInputElement>(null); // Ref untuk shortcut keyboard
-
-  const router = useRouter();
 
   // --- STATE MANAGEMENT ---
   const [products, setProducts] = useState<Product[]>([]);
@@ -91,7 +98,7 @@ export default function POSTerminal() {
   };
 
   // --- 5. Cart Logic ---
-  /* const addToCart = (product: Product) => {
+  const addToCart = (product: Product) => {
     // Cek stok awal dulu
     if (product.stock <= 0) {
       toast.error(`Stok ${product.name} habis!`); // Toast Error
@@ -138,7 +145,7 @@ export default function POSTerminal() {
 
   const removeFromCart = (id: string) => {
     setCart(cart.filter((item) => item.id !== id));
-  }; */
+  };
 
   const handleCheckout = () => {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -155,25 +162,26 @@ export default function POSTerminal() {
     localStorage.setItem("currentOrder", JSON.stringify(orderData));
   };
 
-  // const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  // const tax = subtotal * 0.11;
-  // const total = Math.max(0, subtotal + tax - discount);
+  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const tax = subtotal * 0.11;
+  const total = Math.max(0, subtotal + tax - discount);
 
   return (
     <div className="container-fluid vh-100 overflow-hidden">
       <div className="row h-100">
 
         {/* === BAGIAN KIRI: PRODUK === */}
-        <div className="p-5 d-flex flex-column products">
-          {/* <div className="p-4 d-flex flex-column"> */}
+        <div className="col-md-8 p-3">
+          <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column">
             {/* Header & Search */}
-            <div className="mb-4 d-flex flex-column gap-4">
-              <Button variant="flat" onClick={() => router.back()} className="align-self-start">
-                <span className="material-symbols-outlined">arrow_back</span>
-                Back
-              </Button>
-              <Header title="Pilih Produk"/>
-              {/* <h1 className="fw-bold mb-3" style={{ fontSize: "2.2rem", borderBottom: "3px solid #EFCE9E", paddingBottom: "8px" }}>Pilih Produk</h1> */}
+            <div className="mb-4">
+              <div className="d-flex justify-content-between align-items-center mb-3" style={{ borderBottom: "3px solid #EFCE9E", paddingBottom: "8px" }}>
+                <h1 className="fw-bold mb-0" style={{ fontSize: "2.2rem" }}>Pilih Produk</h1>
+                <Link href="/dashboard" className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
+                  <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>arrow_back</span>
+                  Dashboard
+                </Link>
+              </div>
               <div className="d-flex gap-3">
                 <input
                   ref={searchInputRef} // Attach Ref
@@ -262,12 +270,12 @@ export default function POSTerminal() {
                 })}
               </div>
             )}
-          {/* </div> */}
+          </div>
         </div>
 
-        {/* === BAGIAN KANAN: KERANJANG (Sama Persis) === */}
-        <div className="p-5 d-flex flex-column side">
-          {/* <div className="p-4 d-flex flex-column"> */}
+        {/* === BAGIAN KANAN: KERANJANG (Tidak Berubah Banyak) === */}
+        <div className="col-md-4 p-3">
+          <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column">
             {/* Header Cart */}
             <div className="border-bottom border-2 pb-3 mb-3" style={{ borderColor: "#EFCE9E" }}>
               <h2 className="fw-bold mb-0" style={{ fontSize: "1.8rem" }}>Pesanan Saat Ini</h2>
@@ -344,10 +352,10 @@ export default function POSTerminal() {
                 Lanjutkan ke Pembayaran
               </Link>
             </div>
-          {/* </div> */}
+          </div>
         </div>
 
-      {/* </div> */}
+      </div>
     </div>
   );
 }

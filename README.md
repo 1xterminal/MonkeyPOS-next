@@ -56,7 +56,7 @@ File path: `app/(app)/settings/page.tsx`
 
 ```tsx
 import React from 'react';
-import Button from '@/app/components/ui/Button';
+import Button from '@/components/ui/Button';
 
 export default function SettingsPage() {
   return (

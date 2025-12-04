@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import Header from '@/app/components/ui/Header';
-import { Button } from '@/app/components/ui/Button';
-import { Input } from '@/app/components/ui/Input';
+import Header from '@/components/Header';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 
 export default function SettingsPage() {
     const [user, setUser] = useState<{ name: string; role: string; username: string } | null>(null);
