@@ -1,23 +1,26 @@
 'use client';
 
 import { useState, FormEvent, ChangeEvent, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import styles from './ProductAdd.module.css';
-import { createProduct } from '../actions';
+import { useRouter, useSearchParams } from 'next/navigation';
+import styles from './ProductEdit.module.css';
+import { getProduct, updateProduct } from '../actions';
 
-interface Product {
-    name: string;
-    sku: string;
-    category: string;
-    price: number;
-    stock: number;
-    image: string | null;
-}
-
-export default function ProductAddPage() {
+export default function ProductEditPage() {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const sku = searchParams.get('sku');
+
+    const [formData, setFormData] = useState({
+        name: '',
+        sku: '',
+        category: '',
+        price: '',
+        stock: '',
+    });
+    const [originalSku, setOriginalSku] = useState('');
     const [productImageBase64, setProductImageBase64] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [userName, setUserName] = useState<string>('Guest');
 
     useEffect(() => {
@@ -41,7 +44,45 @@ export default function ProductAddPage() {
             }
         };
         getUserInfo();
-    }, []);
+
+        // Load product data
+        const loadProduct = async () => {
+            if (!sku) {
+                alert('SKU produk tidak ditemukan.');
+                router.push('/products');
+                return;
+            }
+
+            try {
+                const result = await getProduct(sku);
+
+                if (result.success && result.data) {
+                    setFormData({
+                        name: result.data.name,
+                        sku: result.data.sku,
+                        category: result.data.category,
+                        price: result.data.price,
+                        stock: result.data.stock,
+                    });
+                    setOriginalSku(result.data.sku);
+                    if (result.data.image) {
+                        setProductImageBase64(result.data.image);
+                    }
+                } else {
+                    alert(result.error || 'Produk tidak ditemukan.');
+                    router.push('/products');
+                }
+            } catch (error) {
+                console.error('Error loading product:', error);
+                alert('Terjadi kesalahan saat memuat data produk.');
+                router.push('/products');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadProduct();
+    }, [sku, router]);
 
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -59,23 +100,26 @@ export default function ProductAddPage() {
         setIsSubmitting(true);
 
         try {
-            const formData = new FormData(e.currentTarget);
+            const formDataToSend = new FormData(e.currentTarget);
+
+            // Tambahkan original SKU untuk validasi
+            formDataToSend.set('original-sku', originalSku);
 
             if (productImageBase64) {
-                formData.set('product-image', productImageBase64);
+                formDataToSend.set('product-image', productImageBase64);
             }
 
-            const result = await createProduct(formData);
+            const result = await updateProduct(formDataToSend);
 
             if (result.success) {
-                alert('Produk berhasil ditambahkan!');
+                alert('Produk berhasil diupdate!');
                 router.push('/products');
             } else {
-                alert(result.error || 'Gagal menambahkan produk.');
+                alert(result.error || 'Gagal mengupdate produk.');
             }
         } catch (error) {
             console.error('Error submitting form:', error);
-            alert('Terjadi kesalahan saat menambahkan produk.');
+            alert('Terjadi kesalahan saat mengupdate produk.');
         } finally {
             setIsSubmitting(false);
         }
@@ -85,9 +129,13 @@ export default function ProductAddPage() {
         router.push('/products');
     };
 
+    if (isLoading) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <>
-            <div className={styles.productAddContent}>
+            <div className={styles.productEditContent}>
                 <div className={styles.headerActions}>
                     <div className={styles.rightBox}>
                         <div className={styles.userProfile}>
@@ -105,19 +153,39 @@ export default function ProductAddPage() {
                         </button>
                     </div>
                 </div>
-                <h1>Tambahkan Produk Baru</h1>
-                <form id="product-add-form" className={styles.productAddForm} onSubmit={handleSubmit}>
+                <h1>Ubah Produk</h1>
+                <form id="product-edit-form" className={styles.productEditForm} onSubmit={handleSubmit}>
                     <div className={styles.formGroup}>
                         <label htmlFor="product-name">Nama Produk</label>
-                        <input type="text" id="product-name" name="product-name" required />
+                        <input
+                            type="text"
+                            id="product-name"
+                            name="product-name"
+                            value={formData.name}
+                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                            required
+                        />
                     </div>
                     <div className={styles.formGroup}>
                         <label htmlFor="product-sku">SKU</label>
-                        <input type="text" id="product-sku" name="product-sku" required />
+                        <input
+                            type="text"
+                            id="product-sku"
+                            name="product-sku"
+                            value={formData.sku}
+                            onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                            required
+                        />
                     </div>
                     <div className={styles.formGroup}>
                         <label htmlFor="product-category">Kategori</label>
-                        <select id="product-category" name="product-category" required>
+                        <select
+                            id="product-category"
+                            name="product-category"
+                            value={formData.category}
+                            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                            required
+                        >
                             <option value="">Pilih Kategori</option>
                             <option value="Drinks">Drinks</option>
                             <option value="Food">Food</option>
@@ -127,11 +195,25 @@ export default function ProductAddPage() {
                     </div>
                     <div className={styles.formGroup}>
                         <label htmlFor="product-price">Harga</label>
-                        <input type="number" id="product-price" name="product-price" required />
+                        <input
+                            type="number"
+                            id="product-price"
+                            name="product-price"
+                            value={formData.price}
+                            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                            required
+                        />
                     </div>
                     <div className={styles.formGroup}>
                         <label htmlFor="product-stock">Stok</label>
-                        <input type="number" id="product-stock" name="product-stock" required />
+                        <input
+                            type="number"
+                            id="product-stock"
+                            name="product-stock"
+                            value={formData.stock}
+                            onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                            required
+                        />
                     </div>
                     <div className={styles.formGroup}>
                         <label htmlFor="product-image">Gambar Produk</label>
