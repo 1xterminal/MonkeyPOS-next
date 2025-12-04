@@ -4,7 +4,7 @@ import { useState, FormEvent, ChangeEvent, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './ProductAdd.module.css';
 import { createProduct } from '../actions';
-import Header from '@/app/components/Header';
+import Header from '@/components/Header';
 
 interface Product {
     name: string;
@@ -107,7 +107,7 @@ export default function ProductAddPage() {
                     </div>
                 </div> */}
                 {/* <h1>Tambahkan Produk Baru</h1> */}
-                <Header title="Tambahkan Produk Baru"/>
+                <Header title="Tambahkan Produk Baru" />
                 <form id="product-add-form" className={styles.productAddForm} onSubmit={handleSubmit}>
                     <div className={styles.formGroup}>
                         <label htmlFor="product-name">Nama Produk</label>

@@ -32,6 +32,7 @@ export default function POSTerminal() {
   const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("Semua");
+  const [discount, setDiscount] = useState(0);
 
   // --- 2. FETCH DATA API ---
   useEffect(() => {
@@ -100,8 +101,8 @@ export default function POSTerminal() {
   const addToCart = (product: Product) => {
     // Cek stok awal dulu
     if (product.stock <= 0) {
-        toast.error(`Stok ${product.name} habis!`); // Toast Error
-        return;
+      toast.error(`Stok ${product.name} habis!`); // Toast Error
+      return;
     }
 
     const existingItem = cart.find((item) => item.id === product.id);
@@ -149,12 +150,13 @@ export default function POSTerminal() {
   const handleCheckout = () => {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const tax = subtotal * 0.11;
-    const total = subtotal + tax;
+    const total = Math.max(0, subtotal + tax - discount); // Ensure total is not negative
 
     const orderData = {
       items: cart,
       subtotal,
       tax,
+      discount,
       total,
     };
     localStorage.setItem("currentOrder", JSON.stringify(orderData));
@@ -162,7 +164,7 @@ export default function POSTerminal() {
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const tax = subtotal * 0.11;
-  const total = subtotal + tax;
+  const total = Math.max(0, subtotal + tax - discount);
 
   return (
     <div className="container-fluid h-100">
@@ -173,7 +175,13 @@ export default function POSTerminal() {
           <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column">
             {/* Header & Search */}
             <div className="mb-4">
-              <h1 className="fw-bold mb-3" style={{ fontSize: "2.2rem", borderBottom: "3px solid #EFCE9E", paddingBottom: "8px" }}>Pilih Produk</h1>
+              <div className="d-flex justify-content-between align-items-center mb-3" style={{ borderBottom: "3px solid #EFCE9E", paddingBottom: "8px" }}>
+                <h1 className="fw-bold mb-0" style={{ fontSize: "2.2rem" }}>Pilih Produk</h1>
+                <Link href="/dashboard" className="btn btn-outline-secondary btn-sm d-flex align-items-center gap-2">
+                  <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>arrow_back</span>
+                  Dashboard
+                </Link>
+              </div>
               <div className="d-flex gap-3">
                 <input
                   ref={searchInputRef} // Attach Ref
@@ -228,17 +236,17 @@ export default function POSTerminal() {
                         onClick={() => addToCart(product)}
                         style={{ cursor: isOutOfStock ? "not-allowed" : "pointer", border: isLowStock ? "2px solid #ff4d4d" : "" }}
                       >
-                        
+
                         {/* Badge Low Stock / Out of Stock */}
                         {isLowStock && (
-                            <span className="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-danger m-2">
-                                Sisa {product.stock}!
-                            </span>
+                          <span className="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-danger m-2">
+                            Sisa {product.stock}!
+                          </span>
                         )}
                         {isOutOfStock && (
-                            <span className="position-absolute top-50 start-50 translate-middle badge bg-dark fs-6 px-3 py-2">
-                                HABIS
-                            </span>
+                          <span className="position-absolute top-50 start-50 translate-middle badge bg-dark fs-6 px-3 py-2">
+                            HABIS
+                          </span>
                         )}
 
                         <div style={{ height: "110px", width: "100%", overflow: "hidden", borderRadius: "8px", backgroundColor: "#f0f0f0" }}>
@@ -310,6 +318,20 @@ export default function POSTerminal() {
                 <span>Pajak (11%)</span>
                 <span>{formatRupiah(tax)}</span>
               </div>
+
+              {/* Discount Input */}
+              <div className="d-flex justify-content-between align-items-center mb-2">
+                <span>Diskon (Rp)</span>
+                <input
+                  type="number"
+                  className="form-control form-control-sm text-end"
+                  style={{ width: "100px" }}
+                  value={discount}
+                  onChange={(e) => setDiscount(Number(e.target.value))}
+                  min="0"
+                />
+              </div>
+
               <div className="d-flex justify-content-between mb-3 fw-bold fs-5" style={{ marginTop: "12px", color: "var(--color-text-highlight)" }}>
                 <span>Total Keseluruhan</span>
                 <span>{formatRupiah(total)}</span>
@@ -319,12 +341,12 @@ export default function POSTerminal() {
                 href={cart.length === 0 ? "#" : "/pos/payment"}
                 className={`btn btn-monkey w-100 py-3 fs-5 ${cart.length === 0 ? "disabled" : ""}`}
                 onClick={(e) => {
-                    if (cart.length === 0) {
-                        e.preventDefault();
-                        toast.error("Keranjang kosong!");
-                    } else {
-                        handleCheckout();
-                    }
+                  if (cart.length === 0) {
+                    e.preventDefault();
+                    toast.error("Keranjang kosong!");
+                  } else {
+                    handleCheckout();
+                  }
                 }}
               >
                 Lanjutkan ke Pembayaran

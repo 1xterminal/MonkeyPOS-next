@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, FormEvent, ChangeEvent, useEffect } from 'react';
+import { useState, FormEvent, ChangeEvent, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './ProductEdit.module.css';
 import { getProduct, updateProduct } from '../actions';
 
-export default function ProductEditPage() {
+function ProductEditContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const sku = searchParams.get('sku');
@@ -61,8 +61,8 @@ export default function ProductEditPage() {
                         name: result.data.name,
                         sku: result.data.sku,
                         category: result.data.category,
-                        price: result.data.price,
-                        stock: result.data.stock,
+                        price: result.data.price.toString(),
+                        stock: result.data.stock.toString(),
                     });
                     setOriginalSku(result.data.sku);
                     if (result.data.image) {
@@ -241,5 +241,13 @@ export default function ProductEditPage() {
                 </form>
             </div>
         </>
+    );
+}
+
+export default function ProductEditPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ProductEditContent />
+        </Suspense>
     );
 }

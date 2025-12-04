@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/ui/Header';
 import TableComponent, { Column, Action } from '@/components/ui/Table';
@@ -17,7 +17,7 @@ interface Product {
     stock: number;
 }
 
-export default function ProductsPage() {
+function ProductsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -111,6 +111,7 @@ export default function ProductsPage() {
             style: 'currency',
             currency: 'IDR',
             minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
         }).format(p.price),
     }));
 
@@ -175,7 +176,15 @@ export default function ProductsPage() {
                         />
                     </div>
                 </div>
-            {/* </div> */}
-        </>
+            </div>
+        </div>
+    );
+}
+
+export default function ProductsPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <ProductsContent />
+        </Suspense>
     );
 }
