@@ -26,6 +26,8 @@ export default function PaymentPage() {
     const [total, setTotal] = useState(0);
     const [change, setChange] = useState(0);
 
+    const [invoiceId, setInvoiceId] = useState("");
+
     // 1. Load Data Cart & Members saat halaman dibuka
     useEffect(() => {
         // Load Order dari LocalStorage
@@ -145,6 +147,10 @@ export default function PaymentPage() {
                 // Sukses -> Tampilkan Modal
                 setShowSuccessModal(true);
                 localStorage.removeItem("currentOrder");
+
+                const data = await response.json();
+
+                setInvoiceId(data.invoiceId);
             } else {
                 const errorData = await response.json();
                 alert(`Gagal menyimpan transaksi: ${errorData.error || "Unknown error"}`);
@@ -156,6 +162,12 @@ export default function PaymentPage() {
             setIsLoading(false);
         }
     };
+
+    const handlePrintReceipt = () => {
+        if (invoiceId) {
+            router.push(`/receipt/${invoiceId}`);
+        }
+    }
 
     // Validasi Tombol Bayar
     const isPayDisabled = (paymentMethod === "CASH" && (typeof amountReceived !== "number" || amountReceived < total)) || isLoading;
@@ -358,7 +370,7 @@ export default function PaymentPage() {
                         )}
 
                         <div className="d-flex flex-column gap-2">
-                            <button className="btn btn-outline-dark py-2 fw-bold" onClick={() => alert("Fitur Cetak Struk akan segera hadir!")}>
+                            <button className="btn btn-outline-dark py-2 fw-bold" onClick={() => handlePrintReceipt()}>
                                 <span className="material-symbols-outlined align-middle me-2">print</span>
                                 Cetak Struk
                             </button>
