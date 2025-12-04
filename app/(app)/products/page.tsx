@@ -17,7 +17,7 @@ interface Product {
     stock: number;
 }
 
-function ProductsPageContent() {
+function ProductsContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -111,6 +111,7 @@ function ProductsPageContent() {
             style: 'currency',
             currency: 'IDR',
             minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
         }).format(p.price),
     }));
 
@@ -182,8 +183,8 @@ function ProductsPageContent() {
 
 export default function ProductsPage() {
     return (
-        <Suspense fallback={<div>Loading Products...</div>}>
-            <ProductsPageContent />
+        <Suspense fallback={<div>Loading...</div>}>
+            <ProductsContent />
         </Suspense>
     );
 }

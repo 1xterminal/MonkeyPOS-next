@@ -18,7 +18,7 @@ interface Member {
     points: number;
 }
 
-function MembersPageContent() {
+function MembersContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -200,8 +200,8 @@ function MembersPageContent() {
 
 export default function MembersPage() {
     return (
-        <Suspense fallback={<div>Loading Members...</div>}>
-            <MembersPageContent />
+        <Suspense fallback={<div>Loading...</div>}>
+            <MembersContent />
         </Suspense>
     );
 }

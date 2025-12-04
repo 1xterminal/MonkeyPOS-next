@@ -62,8 +62,8 @@ function ProductEditContent() {
                         name: result.data.name,
                         sku: result.data.sku,
                         category: result.data.category,
-                        price: String(result.data.price),
-                        stock: String(result.data.stock),
+                        price: result.data.price.toString(),
+                        stock: result.data.stock.toString(),
                     });
                     setOriginalSku(result.data.sku);
                     if (result.data.image) {
@@ -250,6 +250,14 @@ function ProductEditContent() {
 export default function ProductEditPage() {
     return (
         <Suspense fallback={<div>Loading Page...</div>}>
+            <ProductEditContent />
+        </Suspense>
+    );
+}
+
+export default function ProductEditPage() {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
             <ProductEditContent />
         </Suspense>
     );

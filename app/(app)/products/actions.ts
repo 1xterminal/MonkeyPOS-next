@@ -1,9 +1,7 @@
 'use server';
 
-import { PrismaClient } from '@prisma/client';
+import prisma from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
-
-const prisma = new PrismaClient();
 
 // function to handle creating a product
 export async function createProduct(formData: FormData) {
@@ -73,12 +71,11 @@ export async function deleteProduct(sku: string) {
     }
 }
 
-// function to handle getting a product by SKU
 export async function getProduct(sku: string) {
     try {
         const product = await prisma.product.findUnique({
             where: { sku },
-            include: { category: true },
+            include: { category: true }
         });
 
         if (!product) {
@@ -89,16 +86,15 @@ export async function getProduct(sku: string) {
             success: true,
             data: {
                 ...product,
-                category: product.category?.name || '',
-            },
+                category: product.category?.name || ''
+            }
         };
     } catch (error) {
-        console.error('Failed to get product:', error);
-        return { success: false, error: 'Failed to get product' };
+        console.error('Failed to fetch product:', error);
+        return { success: false, error: 'Failed to fetch product' };
     }
 }
 
-// function to handle updating a product
 export async function updateProduct(formData: FormData) {
     try {
         const originalSku = formData.get('original-sku') as string;
@@ -109,8 +105,8 @@ export async function updateProduct(formData: FormData) {
         const stock = parseInt(formData.get('product-stock') as string);
         const image = formData.get('product-image') as string | null;
 
-        if (!originalSku || !name || !sku || !price) {
-            return { success: false, error: 'Missing required fields' };
+        if (!originalSku) {
+            return { success: false, error: 'Original SKU missing' };
         }
 
         // Find category
@@ -122,7 +118,7 @@ export async function updateProduct(formData: FormData) {
             return { success: false, error: 'Category not found' };
         }
 
-        // Update product
+        // Update
         await prisma.product.update({
             where: { sku: originalSku },
             data: {
@@ -130,7 +126,7 @@ export async function updateProduct(formData: FormData) {
                 sku,
                 price,
                 stock,
-                image,
+                image: image || undefined, // Only update if image is provided
                 categoryId: category.id,
             },
         });
