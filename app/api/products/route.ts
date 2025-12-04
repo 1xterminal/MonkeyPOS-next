@@ -8,6 +8,7 @@ export async function GET() {
     const products = await prisma.product.findMany({
       include: {
         category: true,
+        supplier: true,
       },
       orderBy: {
         name: 'asc',

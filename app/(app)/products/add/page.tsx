@@ -20,6 +20,7 @@ export default function ProductAddPage() {
     const [productImageBase64, setProductImageBase64] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [userName, setUserName] = useState<string>('Guest');
+    const [suppliers, setSuppliers] = useState<Array<{ id: string, name: string }>>([]);
 
     useEffect(() => {
         // Ambil user info dari JWT token
@@ -42,6 +43,20 @@ export default function ProductAddPage() {
             }
         };
         getUserInfo();
+
+        // Fetch suppliers
+        const getSuppliers = async () => {
+            try {
+                const response = await fetch('/api/suppliers');
+                if (response.ok) {
+                    const data = await response.json();
+                    setSuppliers(data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch suppliers:', error);
+            }
+        };
+        getSuppliers();
     }, []);
 
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -125,6 +140,15 @@ export default function ProductAddPage() {
                             <option value="Food">Food</option>
                             <option value="Snacks">Snacks</option>
                             <option value="Medicine">Medicine</option>
+                        </select>
+                    </div>
+                    <div className={styles.formGroup}>
+                        <label htmlFor="product-supplier">Supplier (Opsional)</label>
+                        <select id="product-supplier" name="product-supplier">
+                            <option value="">-- Pilih Supplier --</option>
+                            {suppliers.map((supplier) => (
+                                <option key={supplier.id} value={supplier.id}>{supplier.name}</option>
+                            ))}
                         </select>
                     </div>
                     <div className={styles.formGroup}>
