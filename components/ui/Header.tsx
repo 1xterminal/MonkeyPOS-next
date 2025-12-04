@@ -4,7 +4,7 @@ import React from 'react';
 import { usePathname } from 'next/navigation';
 import styles from './Header.module.css';
 
-export default function Header() {
+export default function Header({ userName }: { userName?: string }) {
     const pathname = usePathname();
 
     const getTitle = () => {
@@ -22,7 +22,7 @@ export default function Header() {
             <div className={styles.userSection}>
                 <span className={styles.greeting}>
                     <i className="bi bi-person" style={{ marginRight: '8px' }}></i>
-                    Hello, EMP1234
+                    Hello, {userName || 'EMP1234'}
                 </span>
                 <button className={styles.logoutButton} title="Logout">
                     <i className="bi bi-box-arrow-right"></i>

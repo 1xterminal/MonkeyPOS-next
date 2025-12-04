@@ -8,8 +8,11 @@ export default function AppLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="container">
-            <main className="content">
+        <div className="w-100 h-100 d-flex flex-column">
+
+
+            <main className="content h-100 d-flex flex-column">
+
                 {children}
             </main>
         </div>
