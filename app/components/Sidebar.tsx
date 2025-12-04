@@ -67,10 +67,29 @@ export default function Sidebar() {
           <span className="material-symbols-outlined">settings</span>
           Pengaturan
         </Link>
-        <Link href="/login" className="menu text-danger">
+        <button
+          onClick={async () => {
+            try {
+              await fetch('/api/auth/logout', { method: 'POST' });
+              window.location.href = '/login';
+            } catch (error) {
+              console.error('Logout failed:', error);
+            }
+          }}
+          className="menu text-danger"
+          style={{
+            width: '100%',
+            textAlign: 'left',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            fontSize: 'inherit',
+            fontFamily: 'inherit'
+          }}
+        >
           <span className="material-symbols-outlined">logout</span>
           Keluar
-        </Link>
+        </button>
       </div>
 
     </div>
