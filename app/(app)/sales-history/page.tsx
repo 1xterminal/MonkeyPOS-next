@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import styles from './SalesHistory.module.css';
-import Header from '@/app/components/Header';
+import Header from '@/components/ui/Header';
 
 // Types matching Prisma schema
 interface TransactionItem {

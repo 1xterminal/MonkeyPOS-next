@@ -6,7 +6,7 @@ import Link from "next/link";
 import "./style.scss";
 import { Button } from "@/components/ui/Button";
 import { useRouter } from "next/navigation";
-import Header from "../components/Header";
+import Header from "@/components/ui/Header";
 
 // 1. Tipe Data (Sesuai dengan data dari API/Prisma)
 interface Product {

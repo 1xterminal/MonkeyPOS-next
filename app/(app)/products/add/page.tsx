@@ -4,7 +4,7 @@ import { useState, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import styles from './ProductAdd.module.css';
 import { createProduct } from '../actions';
-import Header from '@/app/components/Header';
+import Header from '@/components/ui/Header';
 
 interface Product {
     name: string;

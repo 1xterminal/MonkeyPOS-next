@@ -1,8 +1,7 @@
 import React, { Suspense } from 'react';
 import prisma from '@/lib/prisma';
 import ProductsClient from './ProductsClient';
-// import Header from '@/components/ui/Header';
-import Header from '@/app/components/Header';
+import Header from '@/components/ui/Header';
 
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';

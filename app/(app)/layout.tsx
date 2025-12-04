@@ -2,7 +2,6 @@
 
 import React from 'react';
 import "bootstrap-icons/font/bootstrap-icons.css";
-import Header from '@/components/ui/Header';
 import Sidebar from '../components/Sidebar';
 
 import "./style.scss";
