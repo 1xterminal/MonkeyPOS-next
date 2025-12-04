@@ -160,8 +160,8 @@ export default function POSTerminal() {
   // const total = Math.max(0, subtotal + tax - discount);
 
   return (
-    <div className="pos">
-      {/* <div className=""> */}
+    <div className="container-fluid vh-100 overflow-hidden">
+      <div className="row h-100">
 
         {/* === BAGIAN KIRI: PRODUK === */}
         <div className="p-5 d-flex flex-column products">
