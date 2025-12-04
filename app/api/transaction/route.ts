@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import prisma from "@/lib/prisma";
+import prisma from "@/app/lib/prisma";
 
 // GET - Fetch all transactions for sales history
 export async function GET() {
