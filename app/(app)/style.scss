@@ -2,8 +2,8 @@
     display: flex;
     flex: 1;
 
-    margin-inline: min(10vh, 80px);
-    margin-block: min(10vh, 80px);
+    // margin-inline: min(10vh, 80px);
+    // margin-block: min(10vh, 80px);
 
     max-width: min(80vw, 1280px);
     
@@ -22,5 +22,6 @@
         flex: 1;
         padding: 40px;
         border-left: 1px solid #F0B124;
+        overflow-y: auto;
     }
 }

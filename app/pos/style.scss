@@ -3,8 +3,8 @@
 
     flex: 1;
 
-    margin-inline: min(10vh, 80px);
-    margin-block: min(10vh, 80px);
+    // margin-inline: min(10vh, 80px);
+    // margin-block: min(10vh, 80px);
 
     max-width: min(80vw, 1280px);
 
@@ -18,9 +18,15 @@
         0 2px 20px hsla(0 0% 0% / .1);
     
     overflow: hidden;
+    
+    & .products {
+        width: 100%;
+        overflow-y: auto;
+    }
 
     & .side {
         background: #F2F2F2;
         border-left: 1px solid var(--yellow-80);
+        width: 480px;
     }
 }

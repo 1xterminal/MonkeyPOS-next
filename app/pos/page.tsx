@@ -157,11 +157,11 @@ export default function POSTerminal() {
   const total = subtotal + tax;
 
   return (
-    <div className="pos row">
+    <div className="pos">
       {/* <div className=""> */}
 
         {/* === BAGIAN KIRI: PRODUK === */}
-        <div className="col-md-8 p-5 d-flex flex-column">
+        <div className="p-5 d-flex flex-column products">
           {/* <div className="p-4 d-flex flex-column"> */}
             {/* Header & Search */}
             <div className="mb-4 d-flex flex-column gap-4">
@@ -244,7 +244,7 @@ export default function POSTerminal() {
         </div>
 
         {/* === BAGIAN KANAN: KERANJANG (Sama Persis) === */}
-        <div className="col-md-4 p-5 d-flex flex-column side">
+        <div className="p-5 d-flex flex-column side">
           {/* <div className="p-4 d-flex flex-column"> */}
             {/* Header Cart */}
             <div className="border-bottom border-2 pb-3 mb-3" style={{ borderColor: "#EFCE9E" }}>

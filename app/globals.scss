@@ -15,7 +15,10 @@ body {
   background-color: var(--color-background-offset);
   color: var(--color-text);
   line-height: 1.5;
-  min-height: 100vh;
+  height: 100vh;
+
+  padding-inline: min(10vh, 80px);
+  padding-block: min(10vh, 80px);
 
   display: flex;
   // align-items: center;
