@@ -113,7 +113,7 @@ export default function POSTerminal() {
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         ));
         // Optional: Toast kecil feedback
-        toast.success(`+1 ${product.name}`, { duration: 1000, position: "bottom-center" });
+        toast.success(`+1 ${product.name}`, { duration: 1000 });
       } else {
         toast.error(`Stok ${product.name} tidak mencukupi!`); // Toast Error
       }
