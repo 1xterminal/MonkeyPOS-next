@@ -1,0 +1,49 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--color-text-highlight);
+    margin: 0;
+}
+
+.userSection {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.greeting {
+    font-weight: 500;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+}
+
+.logoutButton {
+    background: none;
+    border: 1px solid #ff4d4d;
+    color: #ff4d4d;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logoutButton:hover {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+.logoutButton i {
+    font-size: 18px;
+}

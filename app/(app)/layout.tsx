@@ -1,5 +1,6 @@
 import React from 'react';
 import "bootstrap-icons/font/bootstrap-icons.css";
+import Header from '@/components/ui/Header';
 
 export default function AppLayout({
     children,
@@ -21,11 +22,7 @@ export default function AppLayout({
             </aside>
 
             <main className="content">
-                {/* Header will go here */}
-                <header style={{ marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <h2>Good Morning!</h2>
-                    <button className="button destructive">Logout</button>
-                </header>
+
                 {children}
             </main>
         </div>

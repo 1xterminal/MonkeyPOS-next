@@ -19,7 +19,7 @@
 .tableData thead {
     background-color: var(--color-primary);
     color: var(--color-text);
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .tableData th {
@@ -38,7 +38,7 @@
     padding: 12px 16px;
     border-bottom: 1px solid var(--color-primary-shadow);
     border-right: 1px solid var(--color-primary-shadow);
-    background-color: var(--color-secondary);
+    background-color: #fff;
     vertical-align: middle;
     color: var(--color-text);
 }
@@ -61,7 +61,7 @@
     padding: 40px;
     color: var(--color-text-shadow);
     font-style: italic;
-    background-color: var(--color-secondary) !important;
+    background-color: #fff !important;
     border: none !important;
 }
 
