@@ -16,7 +16,7 @@ export default function Sidebar() {
 
       <div className="logo-container">
         <img
-          src="/img/logo/logo.svg"
+          src="/logo.svg"
           alt="MonkeyPOS Logo"
           className="logo"
           style={{ width: "150px" }}

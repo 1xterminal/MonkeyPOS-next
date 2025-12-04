@@ -49,6 +49,10 @@ body {
   color: var(--color-text);
   line-height: 1.5;
   min-height: 100vh;
+
+  display: flex;
+  // align-items: center;
+  justify-content: center;
 }
 
 /* =========================================
@@ -165,23 +169,22 @@ body {
   background: linear-gradient(180deg,
       #FFFBE7, #FDF0CB);
 
-  border: 1px solid rgba(228, 157, 0, 0.5);
-  border-radius: 16px;
+  border-right: 1px solid white;
+  // border-radius: 16px;
 
   /* Shadow agar terlihat mengambang */
-  box-shadow:
-    0 2px 10px hsla(0 0% 0 / .1),
-    0 2px 20px hsla(0 0% 0 / .1);
+  // box-shadow:
+  //   0 2px 10px hsla(0 0% 0% / .1),
+  //   0 2px 20px hsla(0 0% 0% / .1);
 
   /* Jarak kanan agar tidak menempel konten */
-  margin-right: 24px;
+  // margin-right: 24px;
 }
 
 .sidebar .logo-container {
   display: flex;
   box-sizing: border-box;
   padding: 20px;
-  justify-content: center;
   margin-bottom: 10px;
 }
 
@@ -209,15 +212,16 @@ body {
 
 .sidebar .menu {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 10px;
+  border-radius: 6px;
   text-decoration: none;
   color: var(--color-text);
   font-weight: 500;
   transition: .2s ease-out;
   margin-bottom: 4px;
+  box-sizing: border-box;
 }
 
 .sidebar .menu .material-symbols-outlined {
@@ -237,4 +241,43 @@ body {
   border: 2px solid var(--color-primary-shadow);
   font-weight: 700;
   cursor: default;
+}
+
+
+
+
+
+.pos-app {
+  display: flex;
+  flex: 1;
+
+  // align-self: stretch;
+  margin-block: min(10vh, 80px);
+  // margin-block: 20vh;
+
+  // align-items: center;
+  // justify-content: center;
+
+  // & > main {
+    // display: flex;
+    // flex: 1;
+    max-width: 90vw;
+    // max-height: 640px
+    
+    background: var(--color-background);
+
+    border: solid 1px #D2940C;
+    border-radius: 16px;
+
+    box-shadow:
+      0 2px 10px hsla(0 0% 0% / .1),
+      0 2px 20px hsla(0 0% 0% / .1);
+    
+    overflow: hidden;
+  // }
+
+  & .content {
+    padding: 40px;
+    border-left: 1px solid #F0B124;
+  }
 }
