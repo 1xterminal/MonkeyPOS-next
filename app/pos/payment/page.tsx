@@ -3,12 +3,16 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import toast from "react-hot-toast";
+import { formatRupiah } from "@/lib/formatters";
+import { useCart } from "@/hooks/useCart";
+import { MEMBER_DISCOUNT_RATE } from "@/lib/constants";
+import CartItemRow from "@/components/pos/CartItemRow";
 
 export default function PaymentPage() {
     const router = useRouter();
 
     // State Data
-    const [cart, setCart] = useState<any[]>([]);
     const [members, setMembers] = useState<any[]>([]);
     const [currentUser, setCurrentUser] = useState<{ id: string; name: string } | null>(null);
 
@@ -19,24 +23,27 @@ export default function PaymentPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false); // Modal State
 
-    // State Kalkulasi
-    const [subtotal, setSubtotal] = useState(0);
-    const [tax, setTax] = useState(0);
+    // Use Custom Hook
+    const { cart, updateQuantity, removeFromCart, subtotal, tax, total: baseTotal, clearCart } = useCart();
+
+    // State Kalkulasi (Derived from hook + local logic)
     const [discount, setDiscount] = useState(0);
     const [total, setTotal] = useState(0);
     const [change, setChange] = useState(0);
 
     const [invoiceId, setInvoiceId] = useState("");
 
-    // 1. Load Data Cart & Members saat halaman dibuka
+    // 1. Load Data Members & User saat halaman dibuka
     useEffect(() => {
-        // Load Order dari LocalStorage
-        const savedOrder = localStorage.getItem("currentOrder");
-        if (savedOrder) {
-            const parsedOrder = JSON.parse(savedOrder);
-            setCart(parsedOrder.items);
-        } else {
-            router.push("/pos"); // Balik ke terminal kalau kosong
+        // Redirect if cart empty (handled by hook usually, but good to be explicit here)
+        if (cart.length === 0) {
+            // Wait a bit to ensure hook loaded
+            const timer = setTimeout(() => {
+                // Check again
+                const savedOrder = localStorage.getItem("currentOrder");
+                if (!savedOrder) router.push("/pos");
+            }, 500);
+            return () => clearTimeout(timer);
         }
 
         // Load Members dari API Database
@@ -57,26 +64,21 @@ export default function PaymentPage() {
                 }
             })
             .catch((err) => console.error("Gagal load user", err));
-    }, [router]);
+    }, [router, cart.length]);
 
     // 2. Kalkulasi Total (Setiap kali cart/member berubah)
     useEffect(() => {
-        const newSubtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-        const newTax = newSubtotal * 0.11;
-
         // Logic Diskon 5% jika member dipilih
         let newDiscount = 0;
         if (selectedMember) {
-            newDiscount = newSubtotal * 0.05;
+            newDiscount = subtotal * MEMBER_DISCOUNT_RATE;
         }
 
-        const newTotal = newSubtotal + newTax - newDiscount;
+        const newTotal = baseTotal - newDiscount;
 
-        setSubtotal(newSubtotal);
-        setTax(newTax);
         setDiscount(newDiscount);
         setTotal(newTotal);
-    }, [cart, selectedMember]);
+    }, [cart, selectedMember, subtotal, baseTotal]);
 
     // 3. Kalkulasi Kembalian
     useEffect(() => {
@@ -86,32 +88,6 @@ export default function PaymentPage() {
             setChange(0);
         }
     }, [amountReceived, total, paymentMethod]);
-
-    // Helper Rupiah
-    const formatRupiah = (num: number) => {
-        return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(num);
-    };
-
-    // Logic Tombol Quantity (+/-) di halaman payment
-    const updateQuantity = (id: string, type: "plus" | "minus") => {
-        const updatedCart = cart.map(item => {
-            if (item.id === id) {
-                if (type === "plus") {
-                    return { ...item, quantity: item.quantity + 1 };
-                } else {
-                    return { ...item, quantity: item.quantity - 1 };
-                }
-            }
-            return item;
-        }).filter(item => item.quantity > 0); // Hapus jika 0
-
-        if (updatedCart.length === 0) {
-            router.push("/pos");
-        } else {
-            setCart(updatedCart);
-            localStorage.setItem("currentOrder", JSON.stringify({ items: updatedCart }));
-        }
-    };
 
     // 4. Handle Selesaikan Penjualan
     const handleCompleteSale = async () => {
@@ -144,20 +120,19 @@ export default function PaymentPage() {
             });
 
             if (response.ok) {
-                // Sukses -> Tampilkan Modal
                 setShowSuccessModal(true);
-                localStorage.removeItem("currentOrder");
+                clearCart(); // Use hook to clear
 
                 const data = await response.json();
 
                 setInvoiceId(data.invoiceId);
             } else {
                 const errorData = await response.json();
-                alert(`Gagal menyimpan transaksi: ${errorData.error || "Unknown error"}`);
+                toast.error(`Gagal: ${errorData.error}`);
             }
         } catch (error) {
             console.error(error);
-            alert("Terjadi kesalahan sistem saat memproses transaksi.");
+            toast.error("Terjadi kesalahan sistem saat memproses transaksi.");
         } finally {
             setIsLoading(false);
         }
@@ -173,7 +148,7 @@ export default function PaymentPage() {
     const isPayDisabled = (paymentMethod === "CASH" && (typeof amountReceived !== "number" || amountReceived < total)) || isLoading;
 
     return (
-        <div className="container-fluid h-100 position-relative">
+        <div className="container-fluid vh-100 position-relative">
             {/* Background Gradient Wrapper */}
             <div className="row h-100 p-4" style={{ background: "linear-gradient(180deg, #FFFBE7, #FDF0CB)", borderRadius: "12px" }}>
 
@@ -184,25 +159,12 @@ export default function PaymentPage() {
 
                         <div className="flex-grow-1 overflow-auto">
                             {cart.map((item) => (
-                                <div key={item.id} className="d-flex justify-content-between align-items-center py-3 border-bottom">
-                                    <div>
-                                        <div className="fw-bold">{item.name}</div>
-                                        <div className="small text-muted">{formatRupiah(item.price)}</div>
-                                    </div>
-                                    <div className="d-flex align-items-center gap-2">
-                                        <button className="qty-btn" onClick={() => updateQuantity(item.id, "minus")}>-</button>
-                                        <span className="fw-bold" style={{ width: "30px", textAlign: "center" }}>{item.quantity}</span>
-                                        <button className="qty-btn" onClick={() => updateQuantity(item.id, "plus")}>+</button>
-                                        <div className="fw-bold text-end" style={{ width: "100px" }}>
-                                            {formatRupiah(item.price * item.quantity)}
-                                        </div>
-                                        <button className="remove-btn" onClick={() => {
-                                            const newCart = cart.filter(c => c.id !== item.id);
-                                            if (newCart.length === 0) router.push("/pos");
-                                            setCart(newCart);
-                                        }}>×</button>
-                                    </div>
-                                </div>
+                                <CartItemRow
+                                    key={item.id}
+                                    item={item}
+                                    onUpdateQuantity={updateQuantity}
+                                    onRemove={removeFromCart}
+                                />
                             ))}
                         </div>
 
@@ -248,7 +210,7 @@ export default function PaymentPage() {
                             <h3 className="fw-bold pb-2 mb-3 border-bottom border-warning" style={{ fontSize: "1.5rem" }}>Metode Pembayaran</h3>
                             <div className="d-flex flex-column gap-2">
                                 {["CASH", "CARD", "E_WALLET"].map((method) => (
-                                    <label key={method} className={`btn btn-outline-warning text-dark text-start fw-bold ${paymentMethod === method ? "active bg-warning" : "bg-white"}`} style={{ border: "2px solid #EFCE9E" }}>
+                                    <label key={method} className={`btn btn-outline-warning text-dark text-start fw-bold rounded-4 ${paymentMethod === method ? "active bg-warning" : "bg-white"}`} style={{ border: "2px solid #EFCE9E" }}>
                                         <input
                                             type="radio"
                                             name="payment"
@@ -283,46 +245,46 @@ export default function PaymentPage() {
                                             border: "2px solid #EFCE9E",
                                             color: "#856404",
                                             background: amountReceived === total ? "#FFFBE7" : "white",
-                                            borderRadius: "10px"
+                                            borderRadius: "16px"
                                         }}
                                     >
                                         Uang Pas
                                     </button>
                                     <button
                                         className="btn flex-grow-1 fw-bold"
-                                        onClick={() => setAmountReceived(20000)}
+                                        onClick={() => setAmountReceived((prev) => (Number(prev) || 0) + 20000)}
                                         style={{
                                             border: "2px solid #EFCE9E",
                                             color: "#856404",
-                                            background: amountReceived === 20000 ? "#FFFBE7" : "white",
-                                            borderRadius: "10px"
+                                            background: "white",
+                                            borderRadius: "16px"
                                         }}
                                     >
-                                        20k
+                                        +20k
                                     </button>
                                     <button
                                         className="btn flex-grow-1 fw-bold"
-                                        onClick={() => setAmountReceived(50000)}
+                                        onClick={() => setAmountReceived((prev) => (Number(prev) || 0) + 50000)}
                                         style={{
                                             border: "2px solid #EFCE9E",
                                             color: "#856404",
-                                            background: amountReceived === 50000 ? "#FFFBE7" : "white",
-                                            borderRadius: "10px"
+                                            background: "white",
+                                            borderRadius: "16px"
                                         }}
                                     >
-                                        50k
+                                        +50k
                                     </button>
                                     <button
                                         className="btn flex-grow-1 fw-bold"
-                                        onClick={() => setAmountReceived(100000)}
+                                        onClick={() => setAmountReceived((prev) => (Number(prev) || 0) + 100000)}
                                         style={{
                                             border: "2px solid #EFCE9E",
                                             color: "#856404",
-                                            background: amountReceived === 100000 ? "#FFFBE7" : "white",
-                                            borderRadius: "10px"
+                                            background: "white",
+                                            borderRadius: "16px"
                                         }}
                                     >
-                                        100k
+                                        +100k
                                     </button>
                                 </div>
 

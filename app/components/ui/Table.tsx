@@ -2,13 +2,14 @@
 
 import React from 'react';
 import styles from './Table.module.css';
-import { defaultOverrides } from 'next/dist/server/require-hook';
 
+// define structure for table column
 export interface Column {
     key: string;
     label: string;
 }
 
+// define structure for table action
 export interface Action<T> {
     label: String;
     icon?: React.ReactNode;
@@ -16,6 +17,7 @@ export interface Action<T> {
     onClick: (item: T, index: number) => void;
 }
 
+// define props for the table component
 interface TableProps<T> {
     columns: Column[];
     data: T[];
@@ -46,18 +48,21 @@ export default function TableComponent<T extends { id?: string | number }>({
                 </thead>
                 <tbody>
                     {isLoading ? (
+                        // display loading state
                         <tr>
                             <td colSpan={colSpanCount} className={styles.emptyCell}>
                                 Loading Data...
                             </td>
                         </tr>
                     ) : data.length === 0 ? (
+                        // display no data state
                         <tr>
                             <td colSpan={colSpanCount} className={styles.emptyCell}>
                                 Belum Ada Data.
                             </td>
                         </tr>
                     ) : (
+                        // display data rows
                         data.map((row: any, index) => (
                             <tr key={row.id || index}>
                                 <td>{index + 1}</td>

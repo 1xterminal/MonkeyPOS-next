@@ -1,4 +1,4 @@
-@import "@/app/globals.scss";
+@import "@/globals.scss";
 
 .tableContainer {
     width: 100%;
@@ -7,6 +7,12 @@
     border-radius: 8px;
     border: 1px solid var(--color-primary-shadow);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.tableContainer::-webkit-scrollbar {
+    display: none;
 }
 
 .tableData {
