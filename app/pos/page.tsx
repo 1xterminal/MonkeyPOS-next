@@ -2,29 +2,39 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import toast from "react-hot-toast";
-import { formatRupiah } from "@/lib/formatters";
-import { Product } from "@/types";
-import { useCart } from "@/hooks/useCart";
-import ProductCard from "@/components/pos/ProductCard";
-import CartItemRow from "@/components/pos/CartItemRow";
+import toast from "react-hot-toast"; // Import Toast
+
+// 1. Tipe Data
+interface Product {
+  id: string;
+  name: string;
+  sku: string;
+  price: number;
+  image: string | null;
+  stock: number;
+  category?: {
+    name: string;
+  };
+}
+
+interface CartItem extends Product {
+  quantity: number;
+}
 
 export default function POSTerminal() {
-  const searchInputRef = useRef<HTMLInputElement>(null);
+  const searchInputRef = useRef<HTMLInputElement>(null); // Ref untuk shortcut keyboard
 
   // --- STATE MANAGEMENT ---
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("Semua");
   const [discount, setDiscount] = useState(0);
 
-  // Use Custom Hook
-  const { cart, addToCart, updateQuantity, removeFromCart, subtotal, tax, total } = useCart();
-
-  // --- FETCH DATA API ---
+  // --- 2. FETCH DATA API ---
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -40,7 +50,7 @@ export default function POSTerminal() {
 
       } catch (error) {
         console.error("Error fetching products:", error);
-        toast.error("Gagal memuat produk dari database.");
+        toast.error("Gagal memuat produk dari database."); // Ganti alert
       } finally {
         setIsLoading(false);
       }
@@ -49,11 +59,12 @@ export default function POSTerminal() {
     fetchProducts();
   }, []);
 
-  // --- KEYBOARD SHORTCUT LISTENER ---
+  // --- KEYBOARD SHORTCUT LISTENER (Fitur Baru!) ---
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Jika tekan tombol '/' dan tidak sedang mengetik di input
       if (e.key === "/" && document.activeElement !== searchInputRef.current) {
-        e.preventDefault();
+        e.preventDefault(); // Mencegah karakter '/' tertulis di input
         searchInputRef.current?.focus();
         toast("Mode Pencarian", { icon: '🔍', duration: 1000 });
       }
@@ -63,7 +74,7 @@ export default function POSTerminal() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // --- Logic Search & Filter ---
+  // --- 3. Logic Search & Filter ---
   useEffect(() => {
     let filtered = products;
     if (selectedCategory !== "Semua") {
@@ -156,7 +167,7 @@ export default function POSTerminal() {
   const total = Math.max(0, subtotal + tax - discount);
 
   return (
-    <div className="container-fluid vh-100">
+    <div className="container-fluid h-100">
       <div className="row h-100">
 
         {/* === BAGIAN KIRI: PRODUK === */}
@@ -173,7 +184,7 @@ export default function POSTerminal() {
               </div>
               <div className="d-flex gap-3">
                 <input
-                  ref={searchInputRef}
+                  ref={searchInputRef} // Attach Ref
                   type="text"
                   className="form-control input-monkey py-2"
                   placeholder="Cari produk... (Tekan '/')"
@@ -262,7 +273,7 @@ export default function POSTerminal() {
           </div>
         </div>
 
-        {/* === BAGIAN KANAN: KERANJANG === */}
+        {/* === BAGIAN KANAN: KERANJANG (Tidak Berubah Banyak) === */}
         <div className="col-md-4 p-3">
           <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column">
             {/* Header Cart */}
@@ -279,12 +290,19 @@ export default function POSTerminal() {
               ) : (
                 <div className="d-flex flex-column gap-3">
                   {cart.map((item) => (
-                    <CartItemRow
-                      key={item.id}
-                      item={item}
-                      onUpdateQuantity={updateQuantity}
-                      onRemove={removeFromCart}
-                    />
+                    <div key={item.id} className="d-flex justify-content-between align-items-center pb-2 border-bottom" style={{ gap: "15px" }}>
+                      <div className="flex-grow-1">
+                        <div className="fw-bold">{item.name}</div>
+                        <div className="small text-muted">{formatRupiah(item.price)}</div>
+                      </div>
+
+                      <div className="d-flex align-items-center gap-2">
+                        <button className="qty-btn" onClick={() => updateQuantity(item.id, "minus")}>-</button>
+                        <span className="fw-bold text-center" style={{ minWidth: "30px" }}>{item.quantity}</span>
+                        <button className="qty-btn" onClick={() => updateQuantity(item.id, "plus")}>+</button>
+                        <button className="remove-btn" onClick={() => removeFromCart(item.id)}>×</button>
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}

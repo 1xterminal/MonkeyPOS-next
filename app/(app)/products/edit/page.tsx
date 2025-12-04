@@ -16,7 +16,9 @@ function ProductEditContent() {
         category: '',
         price: '',
         stock: '',
+        supplier: '',
     });
+    const [suppliers, setSuppliers] = useState<Array<{ id: string, name: string }>>([]);
     const [originalSku, setOriginalSku] = useState('');
     const [productImageBase64, setProductImageBase64] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,6 +66,7 @@ function ProductEditContent() {
                         category: result.data.category,
                         price: result.data.price.toString(),
                         stock: result.data.stock.toString(),
+                        supplier: (result.data as any).supplier?.id || '',
                     });
                     setOriginalSku(result.data.sku);
                     if (result.data.image) {
@@ -82,7 +85,21 @@ function ProductEditContent() {
             }
         };
 
+        // Fetch suppliers
+        const getSuppliers = async () => {
+            try {
+                const response = await fetch('/api/suppliers');
+                if (response.ok) {
+                    const data = await response.json();
+                    setSuppliers(data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch suppliers:', error);
+            }
+        };
+
         loadProduct();
+        getSuppliers();
     }, [sku, router]);
 
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -198,6 +215,20 @@ function ProductEditContent() {
                     </select>
                 </div>
                 <div className={styles.formGroup}>
+                    <label htmlFor="product-supplier">Supplier (Opsional)</label>
+                    <select
+                        id="product-supplier"
+                        name="product-supplier"
+                        value={formData.supplier}
+                        onChange={(e) => setFormData({ ...formData, supplier: e.target.value })}
+                    >
+                        <option value="">-- Pilih Supplier --</option>
+                        {suppliers.map((supplier) => (
+                            <option key={supplier.id} value={supplier.id}>{supplier.name}</option>
+                        ))}
+                    </select>
+                </div>
+                <div className={styles.formGroup}>
                     <label htmlFor="product-price">Harga</label>
                     <input
                         type="number"
@@ -255,10 +286,4 @@ export default function ProductEditPage() {
     );
 }
 
-export default function ProductEditPage() {
-    return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <ProductEditContent />
-        </Suspense>
-    );
-}
+

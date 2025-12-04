@@ -13,6 +13,7 @@ interface Product {
     sku: string;
     name: string;
     category: { name: string } | null;
+    supplier?: { name: string } | null;
     price: number;
     stock: number;
 }
@@ -107,6 +108,7 @@ function ProductsContent() {
     const tableData = filteredProducts.map((p) => ({
         ...p,
         categoryName: p.category?.name || '-',
+        supplierName: p.supplier?.name || '-',
         formattedPrice: new Intl.NumberFormat('id-ID', {
             style: 'currency',
             currency: 'IDR',
@@ -120,6 +122,7 @@ function ProductsContent() {
         { key: 'name', label: 'Nama Produk' },
         { key: 'sku', label: 'SKU' },
         { key: 'categoryName', label: 'Kategori' },
+        { key: 'supplierName', label: 'Supplier' },
         { key: 'formattedPrice', label: 'Harga' },
         { key: 'stock', label: 'Stok' },
     ];
@@ -142,7 +145,7 @@ function ProductsContent() {
     return (
         <div className="p-3 h-100">
             <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column overflow-hidden">
-                <Header userName={userName} />
+                <Header />
 
                 <div className="d-flex flex-column flex-grow-1 gap-3" style={{ minHeight: 0 }}>
                     <div className="d-flex justify-content-between align-items-center flex-shrink-0 w-100">

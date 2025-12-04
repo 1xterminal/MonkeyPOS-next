@@ -41,6 +41,11 @@ export default function Sidebar() {
           Produk
         </Link>
 
+        <Link href="/suppliers" className={`menu ${isActive("/suppliers")}`}>
+          <span className="material-symbols-outlined">local_shipping</span>
+          Supplier
+        </Link>
+
         <Link href="/sales-history" className={`menu ${isActive("/sales-history")}`}>
           <span className="material-symbols-outlined">history</span>
           Riwayat
