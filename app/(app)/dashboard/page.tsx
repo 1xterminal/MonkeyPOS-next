@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import Header from '@/app/components/ui/Header';
 import Link from 'next/link';
 import { BarChart } from '@mui/x-charts/BarChart';
 

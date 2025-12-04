@@ -1,10 +1,50 @@
 .header {
     display: flex;
-    flex-direction: column;
-    gap: 0;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
 }
 
 .title {
-    font-size: 40px;
-    font-weight: 400;
+    font-size: 35px;
+    font-weight: 700;
+    color: var(--color-text);
+    margin: 0;
+}
+
+.userSection {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.greeting {
+    font-weight: 500;
+    font-size: 20px;
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+}
+
+.logoutButton {
+    background: none;
+    border: 1px solid #ff4d4d;
+    color: #ff4d4d;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.logoutButton:hover {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+.logoutButton i {
+    font-size: 18px;
 }
