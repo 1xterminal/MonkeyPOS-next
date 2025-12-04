@@ -77,7 +77,7 @@ export default function ProductsClient({ initialProducts }: ProductsClientProps)
             label: 'Ubah',
             icon: <i className="bi bi-pencil-square"></i>,
             onClick: (row) => {
-                router.push(`/products/${row.id}/edit`);
+                router.push(`/products/edit?sku=${row.sku}`);
             },
         },
         {
@@ -90,29 +90,37 @@ export default function ProductsClient({ initialProducts }: ProductsClientProps)
     ];
 
     return (
-        <div className="space-y-4">
-            <div className="flex flex-col md:flex-row gap-4 justify-between items-center mb-6">
-                <div className="flex gap-2 w-full md:w-auto flex-1 max-w-2xl">
-                    <Input
-                        placeholder="Cari Produk (Nama atau SKU)"
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        onKeyDown={handleKeyDown}
-                        className="w-full"
-                    />
-                    <Button onClick={handleSearch}>Search</Button>
+        <div className="d-flex flex-column h-100 gap-3" style={{ minHeight: 0 }}>
+            <div className="d-flex justify-content-between align-items-center flex-shrink-0 w-100">
+                <div className="d-flex gap-2" style={{ width: '60%' }}>
+                    <div style={{ flex: 1 }}>
+                        <Input
+                            placeholder="Cari Produk (Nama atau SKU)"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onKeyDown={handleKeyDown}
+                            className="w-100"
+                        />
+                    </div>
+                    <div style={{ width: 'auto' }}>
+                        <Button onClick={handleSearch} className="d-flex justify-content-center">Search</Button>
+                    </div>
                 </div>
-                <Button variant="primary" onClick={() => router.push('/products/add')} className="whitespace-nowrap">
-                    Tambahkan Produk Baru
-                </Button>
+                <div style={{ width: 'auto' }}>
+                    <Button variant="primary" onClick={() => router.push('/products/add')} className="text-nowrap d-flex justify-content-center">
+                        Tambahkan Produk Baru
+                    </Button>
+                </div>
             </div>
 
-            <TableComponent
-                columns={columns}
-                data={tableData}
-                actions={actions}
-                isLoading={isLoading}
-            />
+            <div className="flex-grow-1" style={{ minHeight: 0, overflow: 'hidden' }}>
+                <TableComponent
+                    columns={columns}
+                    data={tableData}
+                    actions={actions}
+                    isLoading={isLoading}
+                />
+            </div>
         </div>
     );
 }

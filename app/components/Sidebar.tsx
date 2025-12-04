@@ -41,7 +41,7 @@ export default function Sidebar() {
           Daftar Produk
         </Link>
 
-        <Link href="/history" className={`menu ${isActive("/history")}`}>
+        <Link href="/sales-history" className={`menu ${isActive("/sales-history")}`}>
           <span className="material-symbols-outlined">history</span>
           Riwayat Penjualan
         </Link>

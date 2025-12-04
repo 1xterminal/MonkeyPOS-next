@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import "bootstrap-icons/font/bootstrap-icons.css";
 import Header from '@/components/ui/Header';
@@ -8,6 +10,7 @@ export default function AppLayout({
 }: {
     children: React.ReactNode;
 }) {
+
     return (
         <main className="pos-app">
             <Sidebar />
