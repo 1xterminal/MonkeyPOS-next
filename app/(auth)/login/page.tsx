@@ -2,8 +2,8 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { Button } from '@/app/components/ui/Button';
+import { Input } from '@/app/components/ui/Input';
 import styles from './login.module.css';
 
 export default function LoginPage() {
