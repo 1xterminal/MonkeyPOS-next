@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, FormEvent, ChangeEvent, useEffect } from 'react';
+import { useState, FormEvent, ChangeEvent, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import styles from './ProductEdit.module.css';
 import { getProduct, updateProduct } from '../actions';
 
-export default function ProductEditPage() {
+function ProductEditContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const sku = searchParams.get('sku');
@@ -48,8 +48,9 @@ export default function ProductEditPage() {
         // Load product data
         const loadProduct = async () => {
             if (!sku) {
-                alert('SKU produk tidak ditemukan.');
-                router.push('/products');
+                // alert('SKU produk tidak ditemukan.');
+                // router.push('/products');
+                setIsLoading(false);
                 return;
             }
 
@@ -61,8 +62,8 @@ export default function ProductEditPage() {
                         name: result.data.name,
                         sku: result.data.sku,
                         category: result.data.category,
-                        price: result.data.price,
-                        stock: result.data.stock,
+                        price: String(result.data.price),
+                        stock: String(result.data.stock),
                     });
                     setOriginalSku(result.data.sku);
                     if (result.data.image) {
@@ -133,113 +134,123 @@ export default function ProductEditPage() {
         return <div>Loading...</div>;
     }
 
+    if (!sku) {
+        return <div>Error: SKU tidak ditemukan di URL.</div>;
+    }
+
     return (
-        <>
-            <div className={styles.productEditContent}>
-                <div className={styles.headerActions}>
-                    <div className={styles.rightBox}>
-                        <div className={styles.userProfile}>
-                            <span className="material-symbols-outlined">person</span>
-                            <span>Hello, {userName}</span>
-                        </div>
-                        <button
-                            className={styles.logoutBtn}
-                            onClick={() => {
-                                sessionStorage.removeItem('currentUser');
-                                router.push('/login');
-                            }}
-                        >
-                            <span className="material-symbols-outlined">logout</span>
-                        </button>
+        <div className={styles.productEditContent}>
+            <div className={styles.headerActions}>
+                <div className={styles.rightBox}>
+                    <div className={styles.userProfile}>
+                        <span className="material-symbols-outlined">person</span>
+                        <span>Hello, {userName}</span>
                     </div>
+                    <button
+                        className={styles.logoutBtn}
+                        onClick={() => {
+                            sessionStorage.removeItem('currentUser');
+                            router.push('/login');
+                        }}
+                    >
+                        <span className="material-symbols-outlined">logout</span>
+                    </button>
                 </div>
-                <h1>Ubah Produk</h1>
-                <form id="product-edit-form" className={styles.productEditForm} onSubmit={handleSubmit}>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="product-name">Nama Produk</label>
-                        <input
-                            type="text"
-                            id="product-name"
-                            name="product-name"
-                            value={formData.name}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                            required
-                        />
-                    </div>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="product-sku">SKU</label>
-                        <input
-                            type="text"
-                            id="product-sku"
-                            name="product-sku"
-                            value={formData.sku}
-                            onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-                            required
-                        />
-                    </div>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="product-category">Kategori</label>
-                        <select
-                            id="product-category"
-                            name="product-category"
-                            value={formData.category}
-                            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                            required
-                        >
-                            <option value="">Pilih Kategori</option>
-                            <option value="Drinks">Drinks</option>
-                            <option value="Food">Food</option>
-                            <option value="Snacks">Snacks</option>
-                            <option value="Medicine">Medicine</option>
-                        </select>
-                    </div>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="product-price">Harga</label>
-                        <input
-                            type="number"
-                            id="product-price"
-                            name="product-price"
-                            value={formData.price}
-                            onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                            required
-                        />
-                    </div>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="product-stock">Stok</label>
-                        <input
-                            type="number"
-                            id="product-stock"
-                            name="product-stock"
-                            value={formData.stock}
-                            onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
-                            required
-                        />
-                    </div>
-                    <div className={styles.formGroup}>
-                        <label htmlFor="product-image">Gambar Produk</label>
-                        <input
-                            type="file"
-                            id="product-image"
-                            name="product-image"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                        />
-                        {productImageBase64 && (
-                            <div className={styles.imagePreview}>
-                                <img src={productImageBase64} alt="Preview" />
-                            </div>
-                        )}
-                    </div>
-                    <div className={styles.formActions}>
-                        <button type="button" className={styles.btnCancel} onClick={handleCancel} disabled={isSubmitting}>
-                            Batal
-                        </button>
-                        <button type="submit" className={`${styles.filled} ${styles.btnSubmit}`} disabled={isSubmitting}>
-                            {isSubmitting ? 'Menyimpan...' : 'Simpan'}
-                        </button>
-                    </div>
-                </form>
             </div>
-        </>
+            <h1>Ubah Produk</h1>
+            <form id="product-edit-form" className={styles.productEditForm} onSubmit={handleSubmit}>
+                <div className={styles.formGroup}>
+                    <label htmlFor="product-name">Nama Produk</label>
+                    <input
+                        type="text"
+                        id="product-name"
+                        name="product-name"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        required
+                    />
+                </div>
+                <div className={styles.formGroup}>
+                    <label htmlFor="product-sku">SKU</label>
+                    <input
+                        type="text"
+                        id="product-sku"
+                        name="product-sku"
+                        value={formData.sku}
+                        onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                        required
+                    />
+                </div>
+                <div className={styles.formGroup}>
+                    <label htmlFor="product-category">Kategori</label>
+                    <select
+                        id="product-category"
+                        name="product-category"
+                        value={formData.category}
+                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                        required
+                    >
+                        <option value="">Pilih Kategori</option>
+                        <option value="Drinks">Drinks</option>
+                        <option value="Food">Food</option>
+                        <option value="Snacks">Snacks</option>
+                        <option value="Medicine">Medicine</option>
+                    </select>
+                </div>
+                <div className={styles.formGroup}>
+                    <label htmlFor="product-price">Harga</label>
+                    <input
+                        type="number"
+                        id="product-price"
+                        name="product-price"
+                        value={formData.price}
+                        onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                        required
+                    />
+                </div>
+                <div className={styles.formGroup}>
+                    <label htmlFor="product-stock">Stok</label>
+                    <input
+                        type="number"
+                        id="product-stock"
+                        name="product-stock"
+                        value={formData.stock}
+                        onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
+                        required
+                    />
+                </div>
+                <div className={styles.formGroup}>
+                    <label htmlFor="product-image">Gambar Produk</label>
+                    <input
+                        type="file"
+                        id="product-image"
+                        name="product-image"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                    />
+                    {productImageBase64 && (
+                        <div className={styles.imagePreview}>
+                            <img src={productImageBase64} alt="Preview" />
+                        </div>
+                    )}
+                </div>
+                <div className={styles.formActions}>
+                    <button type="button" className={styles.btnCancel} onClick={handleCancel} disabled={isSubmitting}>
+                        Batal
+                    </button>
+                    <button type="submit" className={`${styles.filled} ${styles.btnSubmit}`} disabled={isSubmitting}>
+                        {isSubmitting ? 'Menyimpan...' : 'Simpan'}
+                    </button>
+                </div>
+            </form>
+        </div>
+    );
+}
+
+export default function ProductEditPage() {
+    return (
+        <Suspense fallback={<div>Loading Page...</div>}>
+            <ProductEditContent />
+        </Suspense>
     );
 }

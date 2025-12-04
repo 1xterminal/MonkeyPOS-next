@@ -72,3 +72,73 @@ export async function deleteProduct(sku: string) {
         return { success: false, error: 'Failed to delete product' };
     }
 }
+
+// function to handle getting a product by SKU
+export async function getProduct(sku: string) {
+    try {
+        const product = await prisma.product.findUnique({
+            where: { sku },
+            include: { category: true },
+        });
+
+        if (!product) {
+            return { success: false, error: 'Product not found' };
+        }
+
+        return {
+            success: true,
+            data: {
+                ...product,
+                category: product.category?.name || '',
+            },
+        };
+    } catch (error) {
+        console.error('Failed to get product:', error);
+        return { success: false, error: 'Failed to get product' };
+    }
+}
+
+// function to handle updating a product
+export async function updateProduct(formData: FormData) {
+    try {
+        const originalSku = formData.get('original-sku') as string;
+        const name = formData.get('product-name') as string;
+        const sku = formData.get('product-sku') as string;
+        const categoryName = formData.get('product-category') as string;
+        const price = parseInt(formData.get('product-price') as string);
+        const stock = parseInt(formData.get('product-stock') as string);
+        const image = formData.get('product-image') as string | null;
+
+        if (!originalSku || !name || !sku || !price) {
+            return { success: false, error: 'Missing required fields' };
+        }
+
+        // Find category
+        const category = await prisma.category.findFirst({
+            where: { name: categoryName },
+        });
+
+        if (!category) {
+            return { success: false, error: 'Category not found' };
+        }
+
+        // Update product
+        await prisma.product.update({
+            where: { sku: originalSku },
+            data: {
+                name,
+                sku,
+                price,
+                stock,
+                image,
+                categoryId: category.id,
+            },
+        });
+
+        revalidatePath('/products');
+        return { success: true };
+    } catch (error) {
+        console.error('Failed to update product:', error);
+        return { success: false, error: 'Failed to update product' };
+    }
+}

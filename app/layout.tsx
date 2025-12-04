@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import BootstrapClient from "./components/BootstrapClient";
 import "./globals.scss";
 import Sidebar from "./components/Sidebar";
-import { Toaster } from "react-hot-toast"; // <--- 1. Import ini
+import { Toaster } from "react-hot-toast";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,8 +32,9 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          {children}
+        {children}
         <BootstrapClient />
+        <Toaster position="top-right" />
       </body>
     </html>
   );
