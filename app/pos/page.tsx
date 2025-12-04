@@ -3,6 +3,11 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
+import "./style.scss";
+import { Button } from "@/components/ui/Button";
+import { useRouter } from "next/navigation";
+import Header from "../components/Header";
+
 // 1. Tipe Data (Sesuai dengan data dari API/Prisma)
 interface Product {
   id: string; // ID dari Prisma biasanya String (CUID/UUID)
@@ -21,6 +26,8 @@ interface CartItem extends Product {
 }
 
 export default function POSTerminal() {
+  const router = useRouter();
+
   // --- STATE MANAGEMENT ---
   const [products, setProducts] = useState<Product[]>([]); // Data produk dari API
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]); // Data hasil search
@@ -150,15 +157,20 @@ export default function POSTerminal() {
   const total = subtotal + tax;
 
   return (
-    <div className="container-fluid h-100">
-      <div className="row h-100">
+    <div className="pos row">
+      {/* <div className=""> */}
 
         {/* === BAGIAN KIRI: PRODUK === */}
-        <div className="col-md-8 p-3">
-          <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column">
+        <div className="col-md-8 p-5 d-flex flex-column">
+          {/* <div className="p-4 d-flex flex-column"> */}
             {/* Header & Search */}
-            <div className="mb-4">
-              <h1 className="fw-bold mb-3" style={{ fontSize: "2.2rem", borderBottom: "3px solid #EFCE9E", paddingBottom: "8px" }}>Pilih Produk</h1>
+            <div className="mb-4 d-flex flex-column gap-4">
+              <Button variant="flat" onClick={() => router.back()} className="align-self-start">
+                <span className="material-symbols-outlined">arrow_back</span>
+                Back
+              </Button>
+              <Header title="Pilih Produk"/>
+              {/* <h1 className="fw-bold mb-3" style={{ fontSize: "2.2rem", borderBottom: "3px solid #EFCE9E", paddingBottom: "8px" }}>Pilih Produk</h1> */}
               <div className="d-flex gap-3">
                 <input
                   type="text"
@@ -228,12 +240,12 @@ export default function POSTerminal() {
                 ))}
               </div>
             )}
-          </div>
+          {/* </div> */}
         </div>
 
         {/* === BAGIAN KANAN: KERANJANG (Sama Persis) === */}
-        <div className="col-md-4 p-3">
-          <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column">
+        <div className="col-md-4 p-5 d-flex flex-column side">
+          {/* <div className="p-4 d-flex flex-column"> */}
             {/* Header Cart */}
             <div className="border-bottom border-2 pb-3 mb-3" style={{ borderColor: "#EFCE9E" }}>
               <h2 className="fw-bold mb-0" style={{ fontSize: "1.8rem" }}>Pesanan Saat Ini</h2>
@@ -289,10 +301,10 @@ export default function POSTerminal() {
                 Lanjutkan ke Pembayaran
               </Link>
             </div>
-          </div>
+          {/* </div> */}
         </div>
 
-      </div>
+      {/* </div> */}
     </div>
   );
 }
