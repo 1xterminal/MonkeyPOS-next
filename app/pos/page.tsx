@@ -8,9 +8,14 @@ import { Product } from "@/types";
 import { useCart } from "@/hooks/useCart";
 import ProductCard from "@/components/pos/ProductCard";
 import CartItemRow from "@/components/pos/CartItemRow";
+import { Button } from "@/app/components/ui/Button";
+import Header from "../components/ui/Header";
+import { useRouter } from "next/navigation";
 
 export default function POSTerminal() {
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  const router = useRouter();
 
   // --- STATE MANAGEMENT ---
   const [products, setProducts] = useState<Product[]>([]);
@@ -87,7 +92,7 @@ export default function POSTerminal() {
   };
 
   // --- 5. Cart Logic ---
-  const addToCart = (product: Product) => {
+  /* const addToCart = (product: Product) => {
     // Cek stok awal dulu
     if (product.stock <= 0) {
       toast.error(`Stok ${product.name} habis!`); // Toast Error
@@ -134,7 +139,7 @@ export default function POSTerminal() {
 
   const removeFromCart = (id: string) => {
     setCart(cart.filter((item) => item.id !== id));
-  };
+  }; */
 
   const handleCheckout = () => {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -151,9 +156,9 @@ export default function POSTerminal() {
     localStorage.setItem("currentOrder", JSON.stringify(orderData));
   };
 
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const tax = subtotal * 0.11;
-  const total = Math.max(0, subtotal + tax - discount);
+  // const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // const tax = subtotal * 0.11;
+  // const total = Math.max(0, subtotal + tax - discount);
 
   return (
     <div className="pos">
