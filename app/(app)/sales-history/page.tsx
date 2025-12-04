@@ -177,7 +177,6 @@ export default function SalesHistoryPage() {
 
     return (
         <>
-            {/* <h1>Riwayat Penjualan</h1> */}
             <Header title="Riwayat Penjualan"/>
 
             {/* Filter & Search */}
