@@ -10,6 +10,7 @@ export default function PaymentPage() {
     // State Data
     const [cart, setCart] = useState<any[]>([]);
     const [members, setMembers] = useState<any[]>([]);
+    const [currentUser, setCurrentUser] = useState<{ id: string; name: string } | null>(null);
 
     // State Input
     const [selectedMember, setSelectedMember] = useState("");
@@ -41,6 +42,19 @@ export default function PaymentPage() {
             .then((res) => res.json())
             .then((data) => setMembers(data))
             .catch((err) => console.error("Gagal load member", err));
+
+        // Load Current User (Kasir) dari API
+        fetch("/api/user/current")
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.id) {
+                    setCurrentUser(data);
+                } else {
+                    console.error("User tidak ditemukan, jalankan: npx prisma db seed");
+                    alert("Error: User kasir tidak ditemukan. Silakan seed database terlebih dahulu.");
+                }
+            })
+            .catch((err) => console.error("Gagal load user", err));
     }, [router]);
 
     // 2. Kalkulasi Total (Setiap kali cart/member berubah)
@@ -109,13 +123,19 @@ export default function PaymentPage() {
             change: paymentMethod === "CASH" ? change : 0,
             items: cart,
             memberId: selectedMember || null,
-            userId: "user_id_placeholder", // Nanti diganti dengan Auth user asli
+            userId: currentUser?.id || "",
         };
+
+        // Validate user exists
+        if (!currentUser?.id) {
+            alert("Error: User kasir tidak ditemukan. Silakan refresh halaman atau seed database.");
+            return;
+        }
 
         setIsLoading(true);
 
         try {
-            const response = await fetch("/api/transactions", {
+            const response = await fetch("/api/transaction", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(transactionData),

@@ -5,12 +5,12 @@ const nextConfig: NextConfig = {
   // Enable the React Compiler if you want automatic memoization support
   reactCompiler: false,
 
-  // Enable “Cache Components” if you plan to use the new caching APIs / use cache directive
-  cacheComponents: true,
+  // Disable "Cache Components" to allow dynamic client routes with usePathname
+  cacheComponents: false,
 
   allowedDevOrigins: ["localhost", "192.168.56.1"],
 
-  
+
 
   // (Optional) Custom image config or aliasing, only add if you need it
   images: {
