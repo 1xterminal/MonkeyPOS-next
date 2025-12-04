@@ -1,0 +1,156 @@
+/* Content Area */
+.productAddContent {
+    position: relative;
+    padding: 20px;
+    background-color: var(--color-background);
+}
+
+/* Header Actions - Top Right Corner inside content box */
+.headerActions {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 24px;
+}
+
+.rightBox {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.userProfile {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    color: #082C4C;
+    font-weight: 600;
+}
+
+.logoutBtn {
+    appearance: none;
+    cursor: pointer;
+    width: 42px;
+    height: 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background-color: #ffebee;
+    color: #d9534f;
+    border: 2px solid #d9534f;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px 0 rgba(213, 83, 79, 0.25);
+    transition: .2s ease-out;
+}
+
+.logoutBtn:hover {
+    background-color: #ffcdd2;
+    box-shadow: 0 3px 12px 0 rgba(213, 83, 79, 0.5);
+}
+
+/* Form Styling */
+.productAddForm {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.formGroup label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.formGroup input,
+.formGroup select {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-family: inherit;
+    font-size: inherit;
+}
+
+.formGroup select {
+    background-color: white;
+    cursor: pointer;
+}
+
+.imagePreview {
+    margin-top: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    background-color: #f9f9f9;
+}
+
+.imagePreview img {
+    max-width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.formActions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+/* Button styles matching MonkeyPOS design system */
+.formActions button {
+    appearance: none;
+    cursor: pointer;
+    display: inline-flex;
+    flex-direction: row;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    font-size: 1rem;
+    color: #003555;
+    background-color: white;
+    border: 2px solid #E49D00;
+    border-radius: 6px;
+    font-weight: 600;
+    box-shadow: 0 2px 8px 0 rgba(185, 136, 1, 0.1);
+    transition: .2s ease-out;
+}
+
+.formActions button:hover {
+    box-shadow: 0 3px 12px 0 rgba(185, 136, 1, 0.25);
+}
+
+.formActions button.filled {
+    background-color: #FFE18C;
+    box-shadow: 0 2px 8px 0 rgba(185, 136, 1, 0.25);
+}
+
+.formActions button.filled:hover {
+    background-color: #FFD03D;
+    box-shadow: 0 3px 12px 0 rgba(185, 136, 1, 0.5);
+}
+
+.formActions button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+    background-color: #ccc;
+    border-color: #999;
+    color: #666;
+}
+
+.formActions button.filled:disabled {
+    background-color: #ddd;
+}

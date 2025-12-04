@@ -25,7 +25,25 @@ async function main() {
         })
     }
 
-    console.log('Created categories:', drinks.name, food.name)
+    let snacks = await prisma.category.findFirst({
+        where: { name: 'Snacks' }
+    })
+    if (!snacks) {
+        snacks = await prisma.category.create({
+            data: { name: 'Snacks' }
+        })
+    }
+
+    let medicine = await prisma.category.findFirst({
+        where: { name: 'Medicine' }
+    })
+    if (!medicine) {
+        medicine = await prisma.category.create({
+            data: { name: 'Medicine' }
+        })
+    }
+
+    console.log('Created categories:', drinks.name, food.name, snacks.name, medicine.name)
 
     // 2. Create Products
     const coffee = await prisma.product.upsert({
