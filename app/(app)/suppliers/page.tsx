@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/ui/Header';
+import TableComponent from '@/components/ui/Table';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import styles from './Suppliers.module.css';
@@ -124,54 +125,31 @@ export default function SuppliersPage() {
                 {isLoading ? (
                     <div>Loading...</div>
                 ) : (
-                    <div className="table-responsive">
-                        <table className="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>Name</th>
-                                    <th>Contact</th>
-                                    <th>Email</th>
-                                    <th>Address</th>
-                                    <th>Products</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {suppliers.map((supplier) => (
-                                    <tr key={supplier.id}>
-                                        <td>{supplier.name}</td>
-                                        <td>{supplier.contact || '-'}</td>
-                                        <td>{supplier.email || '-'}</td>
-                                        <td>{supplier.address || '-'}</td>
-                                        <td>{supplier._count?.products || 0}</td>
-                                        <td>
-                                            <div className="d-flex gap-2">
-                                                <button
-                                                    className="btn btn-sm btn-outline-primary"
-                                                    onClick={() => openModal(supplier)}
-                                                >
-                                                    Ubah
-                                                </button>
-                                                <button
-                                                    className="btn btn-sm btn-outline-danger"
-                                                    onClick={() => handleDelete(supplier.id)}
-                                                >
-                                                    Hapus
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                                {suppliers.length === 0 && (
-                                    <tr>
-                                        <td colSpan={6} className="text-center py-4">
-                                            No suppliers found.
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
+                    <TableComponent
+                        data={suppliers.map(s => ({
+                            ...s,
+                            productCount: s._count?.products || 0
+                        }))}
+                        columns={[
+                            { key: 'name', label: 'Name' },
+                            { key: 'contact', label: 'Contact' },
+                            { key: 'email', label: 'Email' },
+                            { key: 'address', label: 'Address' },
+                            { key: 'productCount', label: 'Products' },
+                        ]}
+                        actions={[
+                            {
+                                label: 'Ubah',
+                                className: 'btn btn-sm btn-outline-primary',
+                                onClick: (supplier) => openModal(supplier as Supplier)
+                            },
+                            {
+                                label: 'Hapus',
+                                className: 'btn btn-sm btn-outline-danger',
+                                onClick: (supplier) => handleDelete(supplier.id)
+                            }
+                        ]}
+                    />
                 )}
 
                 {/* Modal */}
