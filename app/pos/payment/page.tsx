@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import toast from "react-hot-toast";
 
 export default function PaymentPage() {
     const router = useRouter();
@@ -122,16 +123,16 @@ export default function PaymentPage() {
             });
 
             if (response.ok) {
-                // Sukses -> Tampilkan Modal
                 setShowSuccessModal(true);
                 localStorage.removeItem("currentOrder");
+                toast.success("Transaksi Berhasil!"); // Tambahkan ini
             } else {
                 const errorData = await response.json();
-                alert(`Gagal menyimpan transaksi: ${errorData.error || "Unknown error"}`);
+                toast.error(`Gagal: ${errorData.error}`); // Ganti alert
             }
         } catch (error) {
             console.error(error);
-            alert("Terjadi kesalahan sistem saat memproses transaksi.");
+            toast.error("Terjadi kesalahan sistem saat memproses transaksi.");
         } finally {
             setIsLoading(false);
         }
