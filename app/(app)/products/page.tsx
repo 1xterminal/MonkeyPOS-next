@@ -1,7 +1,8 @@
 import React, { Suspense } from 'react';
 import prisma from '@/lib/prisma';
 import ProductsClient from './ProductsClient';
-import Header from '@/components/ui/Header';
+// import Header from '@/components/ui/Header';
+import Header from '@/app/components/Header';
 
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
@@ -55,15 +56,16 @@ export default async function ProductsPage({
     const userName = await getUserName();
 
     return (
-        <div className="p-3 h-100">
-            <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column overflow-hidden">
-                <Header userName={userName} />
+        <>
+            {/* <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column overflow-hidden"> */}
+                {/* <Header userName={userName} /> */}
+                <Header title="Daftar Produk"/>
                 <div className="flex-grow-1" style={{ minHeight: 0 }}>
                     <Suspense fallback={<div>Loading...</div>}>
                         <ProductList searchTerm={searchTerm} />
                     </Suspense>
                 </div>
-            </div>
-        </div>
+            {/* </div> */}
+        </>
     );
 }
