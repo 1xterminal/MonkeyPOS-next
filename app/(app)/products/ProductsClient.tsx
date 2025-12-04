@@ -77,7 +77,7 @@ export default function ProductsClient({ initialProducts }: ProductsClientProps)
             label: 'Ubah',
             icon: <i className="bi bi-pencil-square"></i>,
             onClick: (row) => {
-                router.push(`/products/${row.id}/edit`);
+                router.push(`/products/edit?sku=${row.sku}`);
             },
         },
         {

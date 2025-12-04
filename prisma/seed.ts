@@ -35,11 +35,11 @@ async function main() {
     }
 
     let medicine = await prisma.category.findFirst({
-        where: { name: 'Medication' }
+        where: { name: 'Medicine' }
     })
     if (!medicine) {
         medicine = await prisma.category.create({
-            data: { name: 'Medication' }
+            data: { name: 'Medicine' }
         })
     }
 
