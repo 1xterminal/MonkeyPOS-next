@@ -24,31 +24,31 @@ export default function Sidebar() {
       </div>
 
       <div className="menus top">
-        <Link href="/dashboard" className={`menu ${isActive("/dashboard")}`}>
-          <span className="material-symbols-outlined">dashboard</span>
-          Dashboard
-        </Link>
-      </div>
-
-      <div className="menus center">
         <Link href="/pos" className={`menu ${isActive("/pos")}`}>
           <span className="material-symbols-outlined">point_of_sale</span>
           Terminal POS
         </Link>
+      </div>
+
+      <div className="menus center">
+        <Link href="/dashboard" className={`menu ${isActive("/dashboard")}`}>
+          <span className="material-symbols-outlined">dashboard</span>
+          Dashboard
+        </Link>
 
         <Link href="/products" className={`menu ${isActive("/products")}`}>
-          <span className="material-symbols-outlined">inventory_2</span>
-          Daftar Produk
+          <span className="material-symbols-outlined">box</span>
+          Produk
         </Link>
 
         <Link href="/sales-history" className={`menu ${isActive("/sales-history")}`}>
           <span className="material-symbols-outlined">history</span>
-          Riwayat Penjualan
+          Riwayat
         </Link>
 
         <Link href="/members" className={`menu ${isActive("/members")}`}>
           <span className="material-symbols-outlined">badge</span>
-          Daftar Member
+          Member
         </Link>
 
         <Link href="/reports" className={`menu ${isActive("/reports")}`}>

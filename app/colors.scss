@@ -1,0 +1,58 @@
+:root {
+    /* Color palette */
+
+    /* Yellow shades */
+    --yellow-0: #0F0400FF;
+    --yellow-10: #221300FF;
+    --yellow-20: #442E00FF;
+    --yellow-30: #785300FF;
+    --yellow-40: #B47B00FF;
+    --yellow-50: #E49D00FF;
+    --yellow-60: #FEBA00FF;
+    --yellow-70: #FFD03DFF;
+    --yellow-80: #FFE18CFF;
+    --yellow-90: #FFECB4FF;
+
+    /* Blue shades */
+    --blue-0: #000520FF;
+    --blue-10: #001835FF;
+    --blue-20: #003555FF;
+    --blue-30: #265F86FF;
+    --blue-40: #468EBFFF;
+    --blue-50: #5CB8F6FF;
+    --blue-60: #79C8FAFF;
+    --blue-70: #9CD8FDFF;
+    --blue-80: #BEE5FEFF;
+    --blue-90: #E9F5FFFF;
+
+
+    /* Red Shades (partial) */
+    --red-50: #ffebee;
+    --red-70: #ffcdd2;
+
+
+    /* Main themes */
+
+    /* primary colors */
+    --color-primary: var(--yellow-60);
+    --color-primary-shadow: var(--yellow-40);
+    --color-primary-highlight: var(--yellow-80);
+
+    /* secondary colors */
+    --color-secondary: #FFE8BD;
+    --color-secondary-shadow: #EFCE9E;
+    --color-secondary-highlight: #FFF6C7;
+
+    /* background */
+    --color-background: white;
+    --color-background-offset: var(--blue-90);
+
+    /* text */
+    --color-text: var(--blue-20);
+    --color-text-shadow: var(--blue-0);
+    --color-text-highlight: var(--blue-30);
+    --color-text-transparent: #225F74;
+
+    /* borders */
+    --color-border-light: #785300;
+}
