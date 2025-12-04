@@ -1,0 +1,142 @@
+/* Sales History Page Styles */
+
+/* Filter & Search Area */
+.filterBox {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--color-background, #ffffff);
+    border-radius: var(--border-radius, 8px);
+    padding: 18px 20px;
+    margin-block: 24px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e5e5e5;
+    margin-bottom: 24px;
+}
+
+.filterBox input {
+    flex: 1;
+    min-width: 220px;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 15px;
+}
+
+.filterBox button {
+    padding: 10px 18px;
+    border: 1px solid #ddd;
+    background: #ffffff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+    transition: all 0.2s;
+}
+
+.filterBox button:hover,
+.filterBox button.active {
+    background: var(--color-primary, #FF8C42);
+    color: white;
+    border-color: var(--color-primary, #FF8C42);
+}
+
+.filterBox button.filled {
+    background: var(--color-primary, #FF8C42);
+    color: white;
+    border: none;
+    font-weight: 600;
+}
+
+.filterBox button.filled:hover {
+    background: var(--color-primary-shadow, #e07a35);
+}
+
+/* Table styling */
+.tableWrapper {
+    padding: 0;
+    border: none;
+    box-shadow: none;
+    background: transparent;
+}
+
+.salesTable {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 15px;
+    background: var(--color-background, #ffffff);
+    border-radius: var(--border-radius, 8px);
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.salesTable thead {
+    background: #f8f9fa;
+}
+
+.salesTable th {
+    padding: 16px;
+    text-align: left;
+    font-weight: 600;
+    color: var(--color-text, #333);
+    border-bottom: 2px solid #e5e5e5;
+}
+
+.salesTable td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    color: var(--color-text, #333);
+}
+
+.salesTable tbody tr {
+    transition: background 0.2s;
+}
+
+.salesTable tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.salesTable tr:last-child td {
+    border-bottom: none;
+}
+
+/* Action Link */
+.actionLink {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-text-highlight, #FF8C42);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.actionLink .material-symbols-outlined {
+    font-size: 20px;
+}
+
+.actionLink:hover {
+    color: var(--color-primary-shadow, #e07a35);
+    text-decoration: underline;
+}
+
+@media screen and (max-width: 768px) {
+    .filterBox {
+        justify-content: center;
+    }
+
+    .filterBox input {
+        min-width: 100%;
+    }
+
+    .salesTable {
+        font-size: 14px;
+    }
+
+    .salesTable th,
+    .salesTable td {
+        padding: 10px 12px;
+    }
+}
