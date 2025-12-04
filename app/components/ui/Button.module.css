@@ -53,6 +53,7 @@
     background-color: transparent;
     box-shadow: none;
     border: none;
+    padding-inline: 0;
 }
 
 .flat:hover {

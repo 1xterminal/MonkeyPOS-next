@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { use, useEffect, useState } from "react";
 
-import { Button } from "@/components/ui/Button";
+import { Button } from "@/app/components/ui/Button";
 
 import './style.scss';
 import Link from "next/link";
