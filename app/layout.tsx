@@ -33,8 +33,8 @@ export default function RootLayout({
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
-        <Toaster />
         <BootstrapClient />
+        <Toaster position="top-right" />
       </body>
     </html>
   );
