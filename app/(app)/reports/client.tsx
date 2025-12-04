@@ -45,7 +45,7 @@ interface ProductSales {
 
 export default function ReportsClient({
     userId, userName
-} : {
+}: {
     userId?: string
     userName?: string
 }) {
@@ -53,7 +53,7 @@ export default function ReportsClient({
     const [cashierSales, setCashierSales] = useState<Transaction[]>([]);
     const [productSales, setProductSales] = useState<ProductSales[]>([]);
     const [totalSales, setTotalSales] = useState(0);
-    
+
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -69,9 +69,18 @@ export default function ReportsClient({
     // Load transactions from API on mount
     useEffect(() => {
         const fetchTransactions = async () => {
+            if (!userId) return;
+
             try {
                 setIsLoading(true);
-                const response = await fetch('/api/transaction');
+
+                // Calculate 7 days ago
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                const startDateParam = sevenDaysAgo.toISOString();
+
+                // Fetch filtered transactions
+                const response = await fetch(`/api/transaction?userId=${userId}&startDate=${startDateParam}`);
                 const data = await response.json();
 
                 if (!response.ok) {
@@ -82,18 +91,10 @@ export default function ReportsClient({
                 if (Array.isArray(data)) {
                     setAllTransactions(data);
 
-                    const sevenDaysAgo = new Date();
-                    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                    // Data is already filtered by API
+                    const cashierTransactions = data;
+                    console.log('Filtered transactions:', cashierTransactions);
 
-                    console.log(data);
-
-                    const cashierTransactions = data.filter((transaction: Transaction) => {
-                        const saleDate = new Date(transaction.createdAt);
-                        // console.log(saleDate, sevenDaysAgo);
-                        // console.log(saleDate >= sevenDaysAgo);
-                        return transaction.user?.id === userId && saleDate >= sevenDaysAgo
-                    });
-                    console.log(cashierTransactions);
                     setCashierSales(cashierTransactions);
 
                     const totalSales = cashierTransactions.reduce((acc, transaction) => acc + transaction.total, 0);
@@ -120,7 +121,7 @@ export default function ReportsClient({
                         ...item,
                         totalPrice: item.quantitySold * item.unitPrice
                     }));
-                    
+
                     setProductSales(productSalesData);
                 } else {
                     throw new Error(data.error || 'Format data tidak valid');
@@ -162,28 +163,5 @@ export default function ReportsClient({
                 { key: "totalPrice", label: "Total Harga" }
             ]}>
         </TableComponent>
-
-        {/* <table>
-            <thead>
-                <tr>
-                    <th>Nama Produk</th>
-                    <th>Jumlah Terjual</th>
-                    <th>Harga Satuan</th>
-                    <th>Total Harga</th>
-                </tr>
-            </thead>
-            <tbody>
-                {
-                    productSales.map((product, index) => (
-                        <tr key={index}>
-                            <td>{product.productName}</td>
-                            <td>{product.quantitySold}</td>
-                            <td>{formatRupiah(product.unitPrice)}</td>
-                            <td>{formatRupiah(product.quantitySold * product.unitPrice)}</td>
-                        </tr>
-                    ))
-                }
-            </tbody>
-        </table> */}
     </>;
 }

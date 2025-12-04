@@ -2,14 +2,34 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const [userRole, setUserRole] = useState<'ADMIN' | 'CASHIER' | null>(null);
 
   const isActive = (path: string) => pathname.startsWith(path) ? "active" : "";
 
+  // Fetch user role from JWT
+  useEffect(() => {
+    const getUserRole = async () => {
+      try {
+        const response = await fetch('/api/auth/me');
+        if (response.ok) {
+          const data = await response.json();
+          setUserRole(data.role);
+        }
+      } catch (error) {
+        console.error('Failed to get user role:', error);
+      }
+    };
+    getUserRole();
+  }, []);
+
   // Hide Sidebar on Login Page
   if (pathname === "/login") return null;
+
+  const isAdmin = userRole === 'ADMIN';
 
   return (
     <div className="sidebar">
@@ -36,37 +56,61 @@ export default function Sidebar() {
           Dashboard
         </Link>
 
-        <Link href="/products" className={`menu ${isActive("/products")}`}>
-          <span className="material-symbols-outlined">box</span>
-          Produk
-        </Link>
+        {isAdmin && (
+          <Link href="/products" className={`menu ${isActive("/products")}`}>
+            <span className="material-symbols-outlined">box</span>
+            Produk
+          </Link>
+        )}
 
-        <Link href="/suppliers" className={`menu ${isActive("/suppliers")}`}>
-          <span className="material-symbols-outlined">local_shipping</span>
-          Supplier
-        </Link>
+        {isAdmin && (
+          <Link href="/categories" className={`menu ${isActive("/categories")}`}>
+            <span className="material-symbols-outlined">category</span>
+            Kategori
+          </Link>
+        )}
+
+        {isAdmin && (
+          <Link href="/suppliers" className={`menu ${isActive("/suppliers")}`}>
+            <span className="material-symbols-outlined">local_shipping</span>
+            Supplier
+          </Link>
+        )}
 
         <Link href="/sales-history" className={`menu ${isActive("/sales-history")}`}>
           <span className="material-symbols-outlined">history</span>
           Riwayat
         </Link>
 
-        <Link href="/members" className={`menu ${isActive("/members")}`}>
-          <span className="material-symbols-outlined">badge</span>
-          Member
-        </Link>
+        {isAdmin && (
+          <Link href="/members" className={`menu ${isActive("/members")}`}>
+            <span className="material-symbols-outlined">badge</span>
+            Member
+          </Link>
+        )}
 
-        <Link href="/reports" className={`menu ${isActive("/reports")}`}>
-          <span className="material-symbols-outlined">insert_chart</span>
-          Laporan
-        </Link>
+        {isAdmin && (
+          <Link href="/reports" className={`menu ${isActive("/reports")}`}>
+            <span className="material-symbols-outlined">insert_chart</span>
+            Laporan
+          </Link>
+        )}
+
+        {isAdmin && (
+          <Link href="/employees" className={`menu ${isActive("/employees")}`}>
+            <span className="material-symbols-outlined">group</span>
+            Karyawan
+          </Link>
+        )}
       </div>
 
       <div className="menus bottom">
-        <Link href="/settings" className={`menu ${isActive("/settings")}`}>
-          <span className="material-symbols-outlined">settings</span>
-          Pengaturan
-        </Link>
+        {isAdmin && (
+          <Link href="/settings" className={`menu ${isActive("/settings")}`}>
+            <span className="material-symbols-outlined">settings</span>
+            Pengaturan
+          </Link>
+        )}
         <button
           onClick={async () => {
             try {

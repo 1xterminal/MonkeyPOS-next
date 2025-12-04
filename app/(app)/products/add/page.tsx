@@ -21,6 +21,7 @@ export default function ProductAddPage() {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [userName, setUserName] = useState<string>('Guest');
     const [suppliers, setSuppliers] = useState<Array<{ id: string, name: string }>>([]);
+    const [categories, setCategories] = useState<Array<{ id: string, name: string }>>([]);
 
     useEffect(() => {
         // Ambil user info dari JWT token
@@ -57,6 +58,20 @@ export default function ProductAddPage() {
             }
         };
         getSuppliers();
+
+        // Fetch categories
+        const getCategories = async () => {
+            try {
+                const response = await fetch('/api/categories');
+                if (response.ok) {
+                    const data = await response.json();
+                    setCategories(data);
+                }
+            } catch (error) {
+                console.error('Failed to fetch categories:', error);
+            }
+        };
+        getCategories();
     }, []);
 
     const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -136,10 +151,9 @@ export default function ProductAddPage() {
                         <label htmlFor="product-category">Kategori</label>
                         <select id="product-category" name="product-category" required>
                             <option value="">Pilih Kategori</option>
-                            <option value="Drinks">Drinks</option>
-                            <option value="Food">Food</option>
-                            <option value="Snacks">Snacks</option>
-                            <option value="Medicine">Medicine</option>
+                            {categories.map((category) => (
+                                <option key={category.id} value={category.name}>{category.name}</option>
+                            ))}
                         </select>
                     </div>
                     <div className={styles.formGroup}>
