@@ -1,4 +1,4 @@
-.productAddContent {
+.productEditContent {
     position: relative;
     padding: 20px;
     background-color: var(--color-background);
@@ -53,7 +53,7 @@
 }
 
 /* Form Styling */
-.productAddForm {
+.productEditForm {
     display: flex;
     flex-direction: column;
     gap: 20px;
