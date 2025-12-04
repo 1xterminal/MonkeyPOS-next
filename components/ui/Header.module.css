@@ -6,9 +6,9 @@
 }
 
 .title {
-    font-size: 24px;
+    font-size: 35px;
     font-weight: 700;
-    color: var(--color-text-highlight);
+    color: var(--color-text);
     margin: 0;
 }
 
@@ -20,6 +20,7 @@
 
 .greeting {
     font-weight: 500;
+    font-size: 20px;
     color: var(--color-text);
     display: flex;
     align-items: center;
@@ -29,8 +30,8 @@
     background: none;
     border: 1px solid #ff4d4d;
     color: #ff4d4d;
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     border-radius: 8px;
     display: flex;
     align-items: center;
