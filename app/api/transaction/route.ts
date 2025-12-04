@@ -1,10 +1,28 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-// GET - Fetch all transactions for sales history
-export async function GET() {
+// GET - Fetch transactions for sales history
+// Supports filtering by userId and startDate (ISO string)
+export async function GET(request: NextRequest) {
   try {
+    const searchParams = request.nextUrl.searchParams;
+    const userId = searchParams.get('userId');
+    const startDate = searchParams.get('startDate');
+
+    const whereClause: any = {};
+
+    if (userId) {
+      whereClause.userId = userId;
+    }
+
+    if (startDate) {
+      whereClause.createdAt = {
+        gte: new Date(startDate)
+      };
+    }
+
     const transactions = await prisma.transaction.findMany({
+      where: whereClause,
       include: {
         items: {
           include: {
