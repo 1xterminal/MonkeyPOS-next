@@ -32,7 +32,7 @@ body {
 /* Custom Card MonkeyPOS */
 .card-monkey {
   background-color: var(--color-background);
-  border-radius: var(--border-radius);
+  border-radius: 16px;
   border: 1px solid #eee;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }

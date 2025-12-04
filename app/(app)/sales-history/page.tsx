@@ -36,6 +36,7 @@ interface Transaction {
         id: string;
         name: string;
     };
+    status?: 'COMPLETED' | 'REFUNDED';
 }
 
 export default function SalesHistoryPage() {
@@ -175,10 +176,39 @@ export default function SalesHistoryPage() {
         window.location.href = `/transaction-detail/${encodeURIComponent(id)}`;
     };
 
+    // Handle refund
+    const handleRefund = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent row click
+        if (!confirm('Are you sure you want to refund this transaction? This action cannot be undone.')) return;
+
+        try {
+            setIsLoading(true);
+            const response = await fetch('/api/transactions/refund', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ transactionId: id }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                alert('Refund successful');
+                window.location.reload();
+            } else {
+                alert(data.error || 'Refund failed');
+            }
+        } catch (error) {
+            console.error('Refund error:', error);
+            alert('Refund failed');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
     return (
         <>
             {/* <h1>Riwayat Penjualan</h1> */}
-            <Header title="Riwayat Penjualan"/>
+            <Header title="Riwayat Penjualan" />
 
             {/* Filter & Search */}
             <div className={styles.filterBox}>
@@ -241,14 +271,16 @@ export default function SalesHistoryPage() {
                                 <th>ID Transaksi</th>
                                 <th>Tanggal</th>
                                 <th>Total</th>
+                                <th>Status</th>
                                 <th>Nama Produk</th>
                                 <th>Detail</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredTransactions.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} style={{ textAlign: 'center', padding: '18px' }}>
+                                    <td colSpan={7} style={{ textAlign: 'center', padding: '18px' }}>
                                         Belum ada transaksi.
                                     </td>
                                 </tr>
@@ -257,11 +289,16 @@ export default function SalesHistoryPage() {
                                     <tr
                                         key={tx.id}
                                         onClick={(e) => handleRowClick(tx.invoiceId, e)}
-                                        style={{ cursor: 'pointer' }}
+                                        style={{ cursor: 'pointer', opacity: tx.status === 'REFUNDED' ? 0.6 : 1 }}
                                     >
                                         <td>{tx.invoiceId}</td>
                                         <td>{formatDateTime(tx.createdAt)}</td>
                                         <td>{formatRupiah(tx.total)}</td>
+                                        <td>
+                                            <span className={`badge ${tx.status === 'REFUNDED' ? 'bg-danger' : 'bg-success'}`}>
+                                                {tx.status || 'COMPLETED'}
+                                            </span>
+                                        </td>
                                         <td>{getProductNames(tx)}</td>
                                         <td>
                                             <Link
@@ -271,6 +308,16 @@ export default function SalesHistoryPage() {
                                                 <span className="material-symbols-outlined">visibility</span>
                                                 Lihat
                                             </Link>
+                                        </td>
+                                        <td>
+                                            {tx.status !== 'REFUNDED' && (
+                                                <button
+                                                    className="btn btn-sm btn-outline-danger"
+                                                    onClick={(e) => handleRefund(tx.id, e)}
+                                                >
+                                                    Refund
+                                                </button>
+                                            )}
                                         </td>
                                     </tr>
                                 ))

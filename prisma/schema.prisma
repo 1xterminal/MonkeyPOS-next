@@ -74,6 +74,11 @@ model Member {
   transactions Transaction[]   // A member can make many purchases
 }
 
+enum TransactionStatus {
+  COMPLETED
+  REFUNDED
+}
+
 model Transaction {
   id            String        @id @default(cuid())
   invoiceId     String        @unique // e.g., "INV-20251017-001"
@@ -85,6 +90,8 @@ model Transaction {
   discount      Int           @default(0)
   amountReceived Int
   change        Int
+
+  status        TransactionStatus @default(COMPLETED)
 
   paymentMethod PaymentMethod
   createdAt     DateTime      @default(now())

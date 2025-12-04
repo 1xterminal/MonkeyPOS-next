@@ -10,6 +10,7 @@ export async function GET() {
     });
     return NextResponse.json(members);
   } catch (error) {
+    console.error("Error fetching members:", error);
     return NextResponse.json({ error: "Error fetching members" }, { status: 500 });
   }
 }
