@@ -1,15 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
+import toast from "react-hot-toast"; // Import Toast
 
-// 1. Tipe Data (Sesuai dengan data dari API/Prisma)
+// 1. Tipe Data
 interface Product {
-  id: string; // ID dari Prisma biasanya String (CUID/UUID)
+  id: string;
   name: string;
   sku: string;
   price: number;
-  image: string | null; // Bisa null kalau dari database belum ada gambar
+  image: string | null;
   stock: number;
   category?: {
     name: string;
@@ -21,16 +22,18 @@ interface CartItem extends Product {
 }
 
 export default function POSTerminal() {
+  const searchInputRef = useRef<HTMLInputElement>(null); // Ref untuk shortcut keyboard
+
   // --- STATE MANAGEMENT ---
-  const [products, setProducts] = useState<Product[]>([]); // Data produk dari API
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]); // Data hasil search
+  const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("Semua");
 
-  // --- 2. FETCH DATA DARI API (BAGIAN BARU) ---
+  // --- 2. FETCH DATA API ---
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -41,13 +44,12 @@ export default function POSTerminal() {
         setProducts(data);
         setFilteredProducts(data);
 
-        // Extract Unique Categories
         const uniqueCategories = Array.from(new Set(data.map((p: any) => p.category?.name || "Lainnya"))) as string[];
         setCategories(["Semua", ...uniqueCategories]);
 
       } catch (error) {
         console.error("Error fetching products:", error);
-        alert("Gagal memuat produk dari database.");
+        toast.error("Gagal memuat produk dari database."); // Ganti alert
       } finally {
         setIsLoading(false);
       }
@@ -56,27 +58,36 @@ export default function POSTerminal() {
     fetchProducts();
   }, []);
 
-  // --- 3. Logic Search & Filter Category ---
+  // --- KEYBOARD SHORTCUT LISTENER (Fitur Baru!) ---
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Jika tekan tombol '/' dan tidak sedang mengetik di input
+      if (e.key === "/" && document.activeElement !== searchInputRef.current) {
+        e.preventDefault(); // Mencegah karakter '/' tertulis di input
+        searchInputRef.current?.focus();
+        toast("Mode Pencarian", { icon: '🔍', duration: 1000 });
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // --- 3. Logic Search & Filter ---
   useEffect(() => {
     let filtered = products;
-
-    // Filter by Category
     if (selectedCategory !== "Semua") {
       filtered = filtered.filter((p: any) => (p.category?.name || "Lainnya") === selectedCategory);
     }
-
-    // Filter by Search Query
     if (searchQuery) {
       filtered = filtered.filter((p) =>
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.sku.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }
-
     setFilteredProducts(filtered);
   }, [searchQuery, selectedCategory, products]);
 
-  // --- 4. Helper Format Rupiah ---
   const formatRupiah = (num: number) => {
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
@@ -87,6 +98,12 @@ export default function POSTerminal() {
 
   // --- 5. Cart Logic ---
   const addToCart = (product: Product) => {
+    // Cek stok awal dulu
+    if (product.stock <= 0) {
+        toast.error(`Stok ${product.name} habis!`); // Toast Error
+        return;
+    }
+
     const existingItem = cart.find((item) => item.id === product.id);
 
     if (existingItem) {
@@ -94,15 +111,14 @@ export default function POSTerminal() {
         setCart(cart.map((item) =>
           item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         ));
+        // Optional: Toast kecil feedback
+        toast.success(`+1 ${product.name}`, { duration: 1000, position: "bottom-center" });
       } else {
-        alert(`Stok untuk ${product.name} tidak mencukupi! (Sisa: ${product.stock})`);
+        toast.error(`Stok ${product.name} tidak mencukupi!`); // Toast Error
       }
     } else {
-      if (product.stock > 0) {
-        setCart([...cart, { ...product, quantity: 1 }]);
-      } else {
-        alert(`Stok untuk ${product.name} habis!`);
-      }
+      setCart([...cart, { ...product, quantity: 1 }]);
+      toast.success(`${product.name} masuk keranjang`); // Toast Success
     }
   };
 
@@ -114,13 +130,14 @@ export default function POSTerminal() {
       if (existingItem.quantity < existingItem.stock) {
         setCart(cart.map((item) => (item.id === id ? { ...item, quantity: item.quantity + 1 } : item)));
       } else {
-        alert(`Stok maksimal tercapai!`);
+        toast.error("Stok maksimal tercapai!");
       }
     } else {
       if (existingItem.quantity > 1) {
         setCart(cart.map((item) => (item.id === id ? { ...item, quantity: item.quantity - 1 } : item)));
       } else {
         removeFromCart(id);
+        toast("Item dihapus dari keranjang", { icon: '🗑️' });
       }
     }
   };
@@ -129,7 +146,6 @@ export default function POSTerminal() {
     setCart(cart.filter((item) => item.id !== id));
   };
 
-  // Simpan data ke localStorage saat mau bayar
   const handleCheckout = () => {
     const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const tax = subtotal * 0.11;
@@ -144,7 +160,6 @@ export default function POSTerminal() {
     localStorage.setItem("currentOrder", JSON.stringify(orderData));
   };
 
-  // Perhitungan Total untuk Display
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const tax = subtotal * 0.11;
   const total = subtotal + tax;
@@ -161,9 +176,10 @@ export default function POSTerminal() {
               <h1 className="fw-bold mb-3" style={{ fontSize: "2.2rem", borderBottom: "3px solid #EFCE9E", paddingBottom: "8px" }}>Pilih Produk</h1>
               <div className="d-flex gap-3">
                 <input
+                  ref={searchInputRef} // Attach Ref
                   type="text"
                   className="form-control input-monkey py-2"
-                  placeholder="Cari produk..."
+                  placeholder="Cari produk... (Tekan '/')"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -200,38 +216,56 @@ export default function POSTerminal() {
               </div>
             ) : (
               <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 overflow-auto flex-grow-1" style={{ minHeight: "0", alignContent: "flex-start" }}>
-                {filteredProducts.map((product) => (
-                  <div key={product.id} className="col">
-                    <div
-                      className="card card-monkey h-100 p-3 text-center cursor-pointer"
-                      onClick={() => addToCart(product)}
-                      style={{ cursor: "pointer" }}
-                    >
-                      <div style={{ height: "110px", width: "100%", overflow: "hidden", borderRadius: "8px", backgroundColor: "#f0f0f0" }}>
-                        {/* Fallback image karena di database 'image' masih null */}
-                        <img
-                          src={product.image || "https://placehold.co/150x110?text=No+Img"}
-                          alt={product.name}
-                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                          onError={(e) => (e.currentTarget.src = "https://placehold.co/150x110?text=Error")}
-                        />
-                      </div>
-                      <div className="mt-3 fw-bold text-truncate" style={{ fontSize: "0.95rem" }}>{product.name}</div>
-                      <div className="mt-1 small text-primary fw-bold" style={{ color: "var(--color-text-highlight)" }}>
-                        {formatRupiah(product.price)}
-                      </div>
-                      <div className="mt-1 small text-muted" style={{ fontSize: "0.8rem" }}>
-                        Stok: {product.stock}
+                {filteredProducts.map((product) => {
+                  // Logic Visual Low Stock
+                  const isLowStock = product.stock <= 5 && product.stock > 0;
+                  const isOutOfStock = product.stock === 0;
+
+                  return (
+                    <div key={product.id} className="col">
+                      <div
+                        className={`card card-monkey h-100 p-3 text-center cursor-pointer position-relative ${isOutOfStock ? 'opacity-50 grayscale' : ''}`}
+                        onClick={() => addToCart(product)}
+                        style={{ cursor: isOutOfStock ? "not-allowed" : "pointer", border: isLowStock ? "2px solid #ff4d4d" : "" }}
+                      >
+                        
+                        {/* Badge Low Stock / Out of Stock */}
+                        {isLowStock && (
+                            <span className="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-danger m-2">
+                                Sisa {product.stock}!
+                            </span>
+                        )}
+                        {isOutOfStock && (
+                            <span className="position-absolute top-50 start-50 translate-middle badge bg-dark fs-6 px-3 py-2">
+                                HABIS
+                            </span>
+                        )}
+
+                        <div style={{ height: "110px", width: "100%", overflow: "hidden", borderRadius: "8px", backgroundColor: "#f0f0f0" }}>
+                          <img
+                            src={product.image || "https://placehold.co/150x110?text=No+Img"}
+                            alt={product.name}
+                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                            onError={(e) => (e.currentTarget.src = "https://placehold.co/150x110?text=Error")}
+                          />
+                        </div>
+                        <div className="mt-3 fw-bold text-truncate" style={{ fontSize: "0.95rem" }}>{product.name}</div>
+                        <div className="mt-1 small text-primary fw-bold" style={{ color: "var(--color-text-highlight)" }}>
+                          {formatRupiah(product.price)}
+                        </div>
+                        <div className={`mt-1 small ${isLowStock ? 'text-danger fw-bold' : 'text-muted'}`} style={{ fontSize: "0.8rem" }}>
+                          Stok: {product.stock}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
         </div>
 
-        {/* === BAGIAN KANAN: KERANJANG (Sama Persis) === */}
+        {/* === BAGIAN KANAN: KERANJANG (Tidak Berubah Banyak) === */}
         <div className="col-md-4 p-3">
           <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column">
             {/* Header Cart */}
@@ -284,7 +318,14 @@ export default function POSTerminal() {
               <Link
                 href={cart.length === 0 ? "#" : "/pos/payment"}
                 className={`btn btn-monkey w-100 py-3 fs-5 ${cart.length === 0 ? "disabled" : ""}`}
-                onClick={cart.length === 0 ? (e) => e.preventDefault() : handleCheckout}
+                onClick={(e) => {
+                    if (cart.length === 0) {
+                        e.preventDefault();
+                        toast.error("Keranjang kosong!");
+                    } else {
+                        handleCheckout();
+                    }
+                }}
               >
                 Lanjutkan ke Pembayaran
               </Link>

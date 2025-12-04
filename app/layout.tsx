@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import BootstrapClient from "./components/BootstrapClient";
 import "./globals.css";
 import Sidebar from "./components/Sidebar";
+import { Toaster } from "react-hot-toast"; // <--- 1. Import ini
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,7 +44,10 @@ export default function RootLayout({
           </main>
 
         </div>
-
+        
+        {/* 2. Tambahkan komponen Toaster di sini */}
+        <Toaster position="top-center" reverseOrder={false} />
+        
         <BootstrapClient />
       </body>
     </html>
