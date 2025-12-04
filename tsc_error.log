@@ -1,0 +1,24 @@
+app/(app)/dashboard/page.tsx(5,26): error TS2307: Cannot find module '@mui/x-charts/BarChart' or its corresponding type declarations.
+app/(app)/products/edit/page.tsx(250,25): error TS2323: Cannot redeclare exported variable 'default'.
+app/(app)/products/edit/page.tsx(250,25): error TS2393: Duplicate function implementation.
+app/(app)/products/edit/page.tsx(258,25): error TS2323: Cannot redeclare exported variable 'default'.
+app/(app)/products/edit/page.tsx(258,25): error TS2393: Duplicate function implementation.
+app/api/transactions/refund/route.ts(22,25): error TS2339: Property 'status' does not exist on type '{ items: { id: string; price: number; quantity: number; transactionId: string; productId: string; }[]; } & { id: string; createdAt: Date; total: number; invoiceId: string; subtotal: number; tax: number; ... 5 more ...; memberId: string | null; }'.
+app/api/transactions/refund/route.ts(31,25): error TS2353: Object literal may only specify known properties, and 'status' does not exist in type '(Without<TransactionUpdateInput, TransactionUncheckedUpdateInput> & TransactionUncheckedUpdateInput) | (Without<...> & TransactionUpdateInput)'.
+app/pos/page.tsx(25,17): error TS2451: Cannot redeclare block-scoped variable 'addToCart'.
+app/pos/page.tsx(25,28): error TS2451: Cannot redeclare block-scoped variable 'updateQuantity'.
+app/pos/page.tsx(25,44): error TS2451: Cannot redeclare block-scoped variable 'removeFromCart'.
+app/pos/page.tsx(25,60): error TS2451: Cannot redeclare block-scoped variable 'subtotal'.
+app/pos/page.tsx(25,70): error TS2451: Cannot redeclare block-scoped variable 'tax'.
+app/pos/page.tsx(25,75): error TS2451: Cannot redeclare block-scoped variable 'total'.
+app/pos/page.tsx(90,9): error TS2451: Cannot redeclare block-scoped variable 'addToCart'.
+app/pos/page.tsx(101,9): error TS2552: Cannot find name 'setCart'. Did you mean 'useCart'?
+app/pos/page.tsx(110,7): error TS2552: Cannot find name 'setCart'. Did you mean 'useCart'?
+app/pos/page.tsx(115,9): error TS2451: Cannot redeclare block-scoped variable 'updateQuantity'.
+app/pos/page.tsx(121,9): error TS2552: Cannot find name 'setCart'. Did you mean 'useCart'?
+app/pos/page.tsx(127,9): error TS2552: Cannot find name 'setCart'. Did you mean 'useCart'?
+app/pos/page.tsx(135,9): error TS2451: Cannot redeclare block-scoped variable 'removeFromCart'.
+app/pos/page.tsx(136,5): error TS2552: Cannot find name 'setCart'. Did you mean 'useCart'?
+app/pos/page.tsx(154,9): error TS2451: Cannot redeclare block-scoped variable 'subtotal'.
+app/pos/page.tsx(155,9): error TS2451: Cannot redeclare block-scoped variable 'tax'.
+app/pos/page.tsx(156,9): error TS2451: Cannot redeclare block-scoped variable 'total'.
