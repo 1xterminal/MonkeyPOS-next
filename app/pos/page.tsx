@@ -2,38 +2,28 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import toast from "react-hot-toast"; // Import Toast
-
-// 1. Tipe Data
-interface Product {
-  id: string;
-  name: string;
-  sku: string;
-  price: number;
-  image: string | null;
-  stock: number;
-  category?: {
-    name: string;
-  };
-}
-
-interface CartItem extends Product {
-  quantity: number;
-}
+import toast from "react-hot-toast";
+import { formatRupiah } from "@/lib/formatters";
+import { Product } from "@/types";
+import { useCart } from "@/hooks/useCart";
+import ProductCard from "@/components/pos/ProductCard";
+import CartItemRow from "@/components/pos/CartItemRow";
 
 export default function POSTerminal() {
-  const searchInputRef = useRef<HTMLInputElement>(null); // Ref untuk shortcut keyboard
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // --- STATE MANAGEMENT ---
   const [products, setProducts] = useState<Product[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
-  const [cart, setCart] = useState<CartItem[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [categories, setCategories] = useState<string[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("Semua");
 
-  // --- 2. FETCH DATA API ---
+  // Use Custom Hook
+  const { cart, addToCart, updateQuantity, removeFromCart, subtotal, tax, total } = useCart();
+
+  // --- FETCH DATA API ---
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -49,7 +39,7 @@ export default function POSTerminal() {
 
       } catch (error) {
         console.error("Error fetching products:", error);
-        toast.error("Gagal memuat produk dari database."); // Ganti alert
+        toast.error("Gagal memuat produk dari database.");
       } finally {
         setIsLoading(false);
       }
@@ -58,12 +48,11 @@ export default function POSTerminal() {
     fetchProducts();
   }, []);
 
-  // --- KEYBOARD SHORTCUT LISTENER (Fitur Baru!) ---
+  // --- KEYBOARD SHORTCUT LISTENER ---
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Jika tekan tombol '/' dan tidak sedang mengetik di input
       if (e.key === "/" && document.activeElement !== searchInputRef.current) {
-        e.preventDefault(); // Mencegah karakter '/' tertulis di input
+        e.preventDefault();
         searchInputRef.current?.focus();
         toast("Mode Pencarian", { icon: '🔍', duration: 1000 });
       }
@@ -73,7 +62,7 @@ export default function POSTerminal() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
-  // --- 3. Logic Search & Filter ---
+  // --- Logic Search & Filter ---
   useEffect(() => {
     let filtered = products;
     if (selectedCategory !== "Semua") {
@@ -88,84 +77,12 @@ export default function POSTerminal() {
     setFilteredProducts(filtered);
   }, [searchQuery, selectedCategory, products]);
 
-  const formatRupiah = (num: number) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(num);
-  };
-
-  // --- 5. Cart Logic ---
-  const addToCart = (product: Product) => {
-    // Cek stok awal dulu
-    if (product.stock <= 0) {
-        toast.error(`Stok ${product.name} habis!`); // Toast Error
-        return;
-    }
-
-    const existingItem = cart.find((item) => item.id === product.id);
-
-    if (existingItem) {
-      if (existingItem.quantity < product.stock) {
-        setCart(cart.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-        ));
-        // Optional: Toast kecil feedback
-        toast.success(`+1 ${product.name}`, { duration: 1000, position: "bottom-center" });
-      } else {
-        toast.error(`Stok ${product.name} tidak mencukupi!`); // Toast Error
-      }
-    } else {
-      setCart([...cart, { ...product, quantity: 1 }]);
-      toast.success(`${product.name} masuk keranjang`); // Toast Success
-    }
-  };
-
-  const updateQuantity = (id: string, type: "plus" | "minus") => {
-    const existingItem = cart.find((item) => item.id === id);
-    if (!existingItem) return;
-
-    if (type === "plus") {
-      if (existingItem.quantity < existingItem.stock) {
-        setCart(cart.map((item) => (item.id === id ? { ...item, quantity: item.quantity + 1 } : item)));
-      } else {
-        toast.error("Stok maksimal tercapai!");
-      }
-    } else {
-      if (existingItem.quantity > 1) {
-        setCart(cart.map((item) => (item.id === id ? { ...item, quantity: item.quantity - 1 } : item)));
-      } else {
-        removeFromCart(id);
-        toast("Item dihapus dari keranjang", { icon: '🗑️' });
-      }
-    }
-  };
-
-  const removeFromCart = (id: string) => {
-    setCart(cart.filter((item) => item.id !== id));
-  };
-
   const handleCheckout = () => {
-    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-    const tax = subtotal * 0.11;
-    const total = subtotal + tax;
-
-    const orderData = {
-      items: cart,
-      subtotal,
-      tax,
-      total,
-    };
-    localStorage.setItem("currentOrder", JSON.stringify(orderData));
+    // Logic checkout is mainly navigation now, data is in localStorage via hook
   };
-
-  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const tax = subtotal * 0.11;
-  const total = subtotal + tax;
 
   return (
-    <div className="container-fluid h-100">
+    <div className="container-fluid vh-100">
       <div className="row h-100">
 
         {/* === BAGIAN KIRI: PRODUK === */}
@@ -176,7 +93,7 @@ export default function POSTerminal() {
               <h1 className="fw-bold mb-3" style={{ fontSize: "2.2rem", borderBottom: "3px solid #EFCE9E", paddingBottom: "8px" }}>Pilih Produk</h1>
               <div className="d-flex gap-3">
                 <input
-                  ref={searchInputRef} // Attach Ref
+                  ref={searchInputRef}
                   type="text"
                   className="form-control input-monkey py-2"
                   placeholder="Cari produk... (Tekan '/')"
@@ -216,56 +133,19 @@ export default function POSTerminal() {
               </div>
             ) : (
               <div className="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 overflow-auto flex-grow-1" style={{ minHeight: "0", alignContent: "flex-start" }}>
-                {filteredProducts.map((product) => {
-                  // Logic Visual Low Stock
-                  const isLowStock = product.stock <= 5 && product.stock > 0;
-                  const isOutOfStock = product.stock === 0;
-
-                  return (
-                    <div key={product.id} className="col">
-                      <div
-                        className={`card card-monkey h-100 p-3 text-center cursor-pointer position-relative ${isOutOfStock ? 'opacity-50 grayscale' : ''}`}
-                        onClick={() => addToCart(product)}
-                        style={{ cursor: isOutOfStock ? "not-allowed" : "pointer", border: isLowStock ? "2px solid #ff4d4d" : "" }}
-                      >
-                        
-                        {/* Badge Low Stock / Out of Stock */}
-                        {isLowStock && (
-                            <span className="position-absolute top-0 end-0 translate-middle badge rounded-pill bg-danger m-2">
-                                Sisa {product.stock}!
-                            </span>
-                        )}
-                        {isOutOfStock && (
-                            <span className="position-absolute top-50 start-50 translate-middle badge bg-dark fs-6 px-3 py-2">
-                                HABIS
-                            </span>
-                        )}
-
-                        <div style={{ height: "110px", width: "100%", overflow: "hidden", borderRadius: "8px", backgroundColor: "#f0f0f0" }}>
-                          <img
-                            src={product.image || "https://placehold.co/150x110?text=No+Img"}
-                            alt={product.name}
-                            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                            onError={(e) => (e.currentTarget.src = "https://placehold.co/150x110?text=Error")}
-                          />
-                        </div>
-                        <div className="mt-3 fw-bold text-truncate" style={{ fontSize: "0.95rem" }}>{product.name}</div>
-                        <div className="mt-1 small text-primary fw-bold" style={{ color: "var(--color-text-highlight)" }}>
-                          {formatRupiah(product.price)}
-                        </div>
-                        <div className={`mt-1 small ${isLowStock ? 'text-danger fw-bold' : 'text-muted'}`} style={{ fontSize: "0.8rem" }}>
-                          Stok: {product.stock}
-                        </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                {filteredProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    onClick={addToCart}
+                  />
+                ))}
               </div>
             )}
           </div>
         </div>
 
-        {/* === BAGIAN KANAN: KERANJANG (Tidak Berubah Banyak) === */}
+        {/* === BAGIAN KANAN: KERANJANG === */}
         <div className="col-md-4 p-3">
           <div className="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column">
             {/* Header Cart */}
@@ -282,19 +162,12 @@ export default function POSTerminal() {
               ) : (
                 <div className="d-flex flex-column gap-3">
                   {cart.map((item) => (
-                    <div key={item.id} className="d-flex justify-content-between align-items-center pb-2 border-bottom" style={{ gap: "15px" }}>
-                      <div className="flex-grow-1">
-                        <div className="fw-bold">{item.name}</div>
-                        <div className="small text-muted">{formatRupiah(item.price)}</div>
-                      </div>
-
-                      <div className="d-flex align-items-center gap-2">
-                        <button className="qty-btn" onClick={() => updateQuantity(item.id, "minus")}>-</button>
-                        <span className="fw-bold text-center" style={{ minWidth: "30px" }}>{item.quantity}</span>
-                        <button className="qty-btn" onClick={() => updateQuantity(item.id, "plus")}>+</button>
-                        <button className="remove-btn" onClick={() => removeFromCart(item.id)}>×</button>
-                      </div>
-                    </div>
+                    <CartItemRow
+                      key={item.id}
+                      item={item}
+                      onUpdateQuantity={updateQuantity}
+                      onRemove={removeFromCart}
+                    />
                   ))}
                 </div>
               )}
@@ -319,12 +192,12 @@ export default function POSTerminal() {
                 href={cart.length === 0 ? "#" : "/pos/payment"}
                 className={`btn btn-monkey w-100 py-3 fs-5 ${cart.length === 0 ? "disabled" : ""}`}
                 onClick={(e) => {
-                    if (cart.length === 0) {
-                        e.preventDefault();
-                        toast.error("Keranjang kosong!");
-                    } else {
-                        handleCheckout();
-                    }
+                  if (cart.length === 0) {
+                    e.preventDefault();
+                    toast.error("Keranjang kosong!");
+                  } else {
+                    handleCheckout();
+                  }
                 }}
               >
                 Lanjutkan ke Pembayaran

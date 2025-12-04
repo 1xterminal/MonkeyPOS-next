@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Header from '@/components/ui/Header';
 import TableComponent, { Column, Action } from '@/components/ui/Table';
@@ -18,7 +18,7 @@ interface Member {
     points: number;
 }
 
-export default function MembersPage() {
+function MembersPageContent() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -195,5 +195,13 @@ export default function MembersPage() {
                 />
             </div>
         </div>
+    );
+}
+
+export default function MembersPage() {
+    return (
+        <Suspense fallback={<div>Loading Members...</div>}>
+            <MembersPageContent />
+        </Suspense>
     );
 }

@@ -29,7 +29,7 @@ body {
 /* Custom Card MonkeyPOS */
 .card-monkey {
   background-color: var(--color-background);
-  border-radius: var(--border-radius);
+  border-radius: 16px;
   border: 1px solid #eee;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -212,9 +212,9 @@ body {
   flex: 1;
 
   margin-block: min(10vh, 80px);
-  
+
   max-width: 90vw;
-  
+
   background: var(--color-background);
 
   border: solid 1px #D2940C;
@@ -223,7 +223,7 @@ body {
   box-shadow:
     0 2px 10px hsla(0 0% 0% / .1),
     0 2px 20px hsla(0 0% 0% / .1);
-  
+
   overflow: hidden;
 
   & .content {
