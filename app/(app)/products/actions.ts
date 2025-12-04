@@ -12,6 +12,7 @@ export async function createProduct(formData: FormData) {
         const price = parseInt(formData.get('product-price') as string);
         const stock = parseInt(formData.get('product-stock') as string);
         const image = formData.get('product-image') as string | null;
+        const supplierId = formData.get('product-supplier') as string | null;
 
         // input validation
         if (!name || !sku || !price) {
@@ -45,6 +46,7 @@ export async function createProduct(formData: FormData) {
                 stock,
                 image,
                 categoryId: category.id,
+                supplierId: supplierId || null,
             },
         });
 
@@ -75,7 +77,7 @@ export async function getProduct(sku: string) {
     try {
         const product = await prisma.product.findUnique({
             where: { sku },
-            include: { category: true }
+            include: { category: true, supplier: true }
         });
 
         if (!product) {
@@ -104,6 +106,7 @@ export async function updateProduct(formData: FormData) {
         const price = parseInt(formData.get('product-price') as string);
         const stock = parseInt(formData.get('product-stock') as string);
         const image = formData.get('product-image') as string | null;
+        const supplierId = formData.get('product-supplier') as string | null;
 
         if (!originalSku) {
             return { success: false, error: 'Original SKU missing' };
@@ -128,6 +131,7 @@ export async function updateProduct(formData: FormData) {
                 stock,
                 image: image || undefined, // Only update if image is provided
                 categoryId: category.id,
+                supplierId: supplierId || null,
             },
         });
 

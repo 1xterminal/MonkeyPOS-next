@@ -5,9 +5,26 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { formatRupiah } from "@/lib/formatters";
-import { useCart } from "@/hooks/useCart";
-import { MEMBER_DISCOUNT_RATE } from "@/lib/constants";
-import CartItemRow from "@/components/pos/CartItemRow";
+
+// Constants
+const MEMBER_DISCOUNT_RATE = 0.05;
+
+// Types
+interface CartItem {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    image: string | null;
+}
+
+interface OrderData {
+    items: CartItem[];
+    subtotal: number;
+    tax: number;
+    discount: number;
+    total: number;
+}
 
 export default function PaymentPage() {
     const router = useRouter();
@@ -15,6 +32,10 @@ export default function PaymentPage() {
     // State Data
     const [members, setMembers] = useState<any[]>([]);
     const [currentUser, setCurrentUser] = useState<{ id: string; name: string } | null>(null);
+    const [cart, setCart] = useState<CartItem[]>([]);
+    const [baseSubtotal, setBaseSubtotal] = useState(0);
+    const [baseTax, setBaseTax] = useState(0);
+    const [baseTotal, setBaseTotal] = useState(0);
 
     // State Input
     const [selectedMember, setSelectedMember] = useState("");
@@ -23,27 +44,33 @@ export default function PaymentPage() {
     const [isLoading, setIsLoading] = useState(false);
     const [showSuccessModal, setShowSuccessModal] = useState(false); // Modal State
 
-    // Use Custom Hook
-    const { cart, updateQuantity, removeFromCart, subtotal, tax, total: baseTotal, clearCart } = useCart();
-
-    // State Kalkulasi (Derived from hook + local logic)
+    // State Kalkulasi
     const [discount, setDiscount] = useState(0);
     const [total, setTotal] = useState(0);
     const [change, setChange] = useState(0);
 
     const [invoiceId, setInvoiceId] = useState("");
 
-    // 1. Load Data Members & User saat halaman dibuka
+    // 1. Load Data Members & User & Order saat halaman dibuka
     useEffect(() => {
-        // Redirect if cart empty (handled by hook usually, but good to be explicit here)
-        if (cart.length === 0) {
-            // Wait a bit to ensure hook loaded
-            const timer = setTimeout(() => {
-                // Check again
-                const savedOrder = localStorage.getItem("currentOrder");
-                if (!savedOrder) router.push("/pos");
-            }, 500);
-            return () => clearTimeout(timer);
+        // Load Order from LocalStorage
+        const savedOrder = localStorage.getItem("currentOrder");
+        if (!savedOrder) {
+            router.push("/pos");
+            return;
+        }
+
+        try {
+            const parsedOrder: OrderData = JSON.parse(savedOrder);
+            setCart(parsedOrder.items);
+            setBaseSubtotal(parsedOrder.subtotal);
+            setBaseTax(parsedOrder.tax);
+            setBaseTotal(parsedOrder.total);
+            setDiscount(parsedOrder.discount); // Initial discount from POS page
+        } catch (e) {
+            console.error("Failed to parse order", e);
+            router.push("/pos");
+            return;
         }
 
         // Load Members dari API Database
@@ -64,21 +91,23 @@ export default function PaymentPage() {
                 }
             })
             .catch((err) => console.error("Gagal load user", err));
-    }, [router, cart.length]);
+    }, [router]);
 
-    // 2. Kalkulasi Total (Setiap kali cart/member berubah)
+    // 2. Kalkulasi Total (Setiap kali member berubah)
     useEffect(() => {
         // Logic Diskon 5% jika member dipilih
-        let newDiscount = 0;
+        let memberDiscount = 0;
         if (selectedMember) {
-            newDiscount = subtotal * MEMBER_DISCOUNT_RATE;
+            memberDiscount = baseSubtotal * MEMBER_DISCOUNT_RATE;
         }
 
-        const newTotal = baseTotal - newDiscount;
+        // Total calculation: Base Total (from POS) - Member Discount
+        // Note: Base Total already includes tax and manual discount from POS
+        const newTotal = Math.max(0, baseTotal - memberDiscount);
 
-        setDiscount(newDiscount);
+        setDiscount(memberDiscount); // Update displayed discount to show member discount
         setTotal(newTotal);
-    }, [cart, selectedMember, subtotal, baseTotal]);
+    }, [selectedMember, baseSubtotal, baseTotal]);
 
     // 3. Kalkulasi Kembalian
     useEffect(() => {
@@ -93,9 +122,9 @@ export default function PaymentPage() {
     const handleCompleteSale = async () => {
         const transactionData = {
             total,
-            subtotal,
-            tax,
-            discount,
+            subtotal: baseSubtotal,
+            tax: baseTax,
+            discount: discount, // This might need adjustment if we want to track manual vs member discount separately
             paymentMethod,
             amountReceived: paymentMethod === "CASH" ? Number(amountReceived) : total,
             change: paymentMethod === "CASH" ? change : 0,
@@ -121,10 +150,9 @@ export default function PaymentPage() {
 
             if (response.ok) {
                 setShowSuccessModal(true);
-                clearCart(); // Use hook to clear
+                localStorage.removeItem("currentOrder"); // Clear order
 
                 const data = await response.json();
-
                 setInvoiceId(data.invoiceId);
             } else {
                 const errorData = await response.json();
@@ -159,19 +187,20 @@ export default function PaymentPage() {
 
                         <div className="flex-grow-1 overflow-auto">
                             {cart.map((item) => (
-                                <CartItemRow
-                                    key={item.id}
-                                    item={item}
-                                    onUpdateQuantity={updateQuantity}
-                                    onRemove={removeFromCart}
-                                />
+                                <div key={item.id} className="d-flex justify-content-between align-items-center py-2 border-bottom">
+                                    <div>
+                                        <div className="fw-bold">{item.name}</div>
+                                        <div className="text-muted small">{item.quantity} x {formatRupiah(item.price)}</div>
+                                    </div>
+                                    <div className="fw-bold">{formatRupiah(item.price * item.quantity)}</div>
+                                </div>
                             ))}
                         </div>
 
                         {/* TOTALAN */}
                         <div className="mt-auto pt-3 border-top">
-                            <div className="d-flex justify-content-between mb-2"><span>Subtotal</span><span>{formatRupiah(subtotal)}</span></div>
-                            <div className="d-flex justify-content-between mb-2"><span>Pajak (11%)</span><span>{formatRupiah(tax)}</span></div>
+                            <div className="d-flex justify-content-between mb-2"><span>Subtotal</span><span>{formatRupiah(baseSubtotal)}</span></div>
+                            <div className="d-flex justify-content-between mb-2"><span>Pajak (11%)</span><span>{formatRupiah(baseTax)}</span></div>
                             {selectedMember && (
                                 <div className="d-flex justify-content-between mb-2 text-success fw-bold">
                                     <span>Diskon Member (5%)</span>
