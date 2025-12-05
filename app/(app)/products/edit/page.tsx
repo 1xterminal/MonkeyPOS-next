@@ -24,30 +24,8 @@ function ProductEditContent() {
     const [productImageBase64, setProductImageBase64] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [userName, setUserName] = useState<string>('Guest');
 
     useEffect(() => {
-        // Ambil user info dari JWT token
-        const getUserInfo = async () => {
-            try {
-                console.log('Fetching user info from /api/auth/me...');
-                const response = await fetch('/api/auth/me');
-                console.log('Response status:', response.status);
-
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('User data received:', data);
-                    setUserName(data.name || 'Guest');
-                } else {
-                    const errorData = await response.json();
-                    console.error('Failed to get user info:', errorData);
-                }
-            } catch (error) {
-                console.error('Failed to get user info:', error);
-            }
-        };
-        getUserInfo();
-
         // Load product data
         const loadProduct = async () => {
             if (!sku) {
@@ -172,23 +150,6 @@ function ProductEditContent() {
 
     return (
         <div className={styles.productEditContent}>
-            <div className={styles.headerActions}>
-                <div className={styles.rightBox}>
-                    <div className={styles.userProfile}>
-                        <span className="material-symbols-outlined">person</span>
-                        <span>Hello, {userName}</span>
-                    </div>
-                    <button
-                        className={styles.logoutBtn}
-                        onClick={() => {
-                            sessionStorage.removeItem('currentUser');
-                            router.push('/login');
-                        }}
-                    >
-                        <span className="material-symbols-outlined">logout</span>
-                    </button>
-                </div>
-            </div>
             <h1>Ubah Produk</h1>
             <form id="product-edit-form" className={styles.productEditForm} onSubmit={handleSubmit}>
                 <div className={styles.formGroup}>
